@@ -1,35 +1,49 @@
-# L&J Point of Sale (test build)
+# L&J Point of Sale
 
-A test point-of-sale and guest list for restaurants and bars. One file, no database yet: everything is remembered in the browser on the device it runs on.
+A restaurant and bar point of sale built to be learned in ten minutes. One file, runs in any browser, keeps working with no internet. No shared database yet, so each tablet remembers its own day.
 
 Open it: https://jrk1226.github.io/L-J/
 
+The earlier, simpler build is still at https://jrk1226.github.io/L-J/classic.html
+
 ## Test PINs
 
-- Josh 1234 (manager)
-- Sam 1111
-- Alex 2222
+- Josh 1234 (owner)
+- Dana 4444 (manager)
+- Sam 1111 (server)
+- Alex 2222 (server)
+- Mike 3333 (bartender)
 
-Managers can change these under Settings.
+## What a server does
 
-## What is in it
+1. Enter a PIN.
+2. See the floor: every table, who is on it, how long, the total, and its state (Available, Seated, Order entered, Food sent, Food is up, Food served, Check requested, Paid).
+3. Tap a table. Tap a guest, tap what they want. Items that need a choice (temperature, side, sauce) ask only for that. Everything else is one tap.
+4. Send. Food goes to the right station (Fry, Cold, Grill, Dessert), drinks go to the Bar. Hold entrees and fire them when the apps are cleared.
+5. When the kitchen taps Ready, the table lights up green on the floor and the Floor tab blinks.
+6. Split (evenly, by guest, by item, custom amounts), then Pay (card, cash, gift card, house account, phone pay), or hand the tablet to the guest: tip, tap, sign, receipt.
+7. The table frees itself after the last payment.
 
-- **Order** - tables across the top, menu in the middle, the check on the right. Search box, a Quick row of what gets rung up most, seats on a check, choices (Hot, Medium rare, No onions) and kitchen notes on every line. Hold a tile to add more than one or to 86 it for the night. Undo on the last thing you did.
-- **Send** splits food to the Kitchen tab and drinks to the Bar tab. Each tab only shows its own tickets, with its own count on the rail. **Print check** prints an 80mm slip with tip lines.
-- **Pay** - whole check, one seat, or split evenly. Tip buttons, "Flip to guest" so they pick the tip on the screen, cash with change back, a pretend card reader, house accounts. Receipt with a QR code to join the guest list.
-- **Void** always asks why and lands in the Voids report. Voiding something already sent needs a manager PIN.
-- **Kitchen** - food tickets in order, amber after 8 minutes and red after 12, Ready and Print.
-- **Bar** - drink tickets only, amber after 5 minutes and red after 8, Made and Print.
-- **History** on both Kitchen and Bar - look back at finished tickets, search by table or item, see when it was sent, when it was ready and whether it was picked up, reprint it, or put it back on the line.
-- **Ready alerts** - when the kitchen taps Ready or the bar taps Made, the server sees a green "Food is up" or "Drinks up" bar at the top of Order, the table lights up green, and the Order tab gets a blinking count. Tap Picked up to clear it.
-- **Guests** - regulars, birthdays this week, who has not been in for 30 days, house account tabs and statements. Tap a phone number to text. A QR code lets guests add themselves.
-- **Reports** - today, by server, by hour, by day of week, tips owed at close, closed checks with reprint, voids.
-- **Settings** (managers) - menu items with photos and choices, categories, staff and PINs, big-finger mode, light or dark look, tax rate, tip buttons, reset to sample data.
+Hold any line for Repeat, Change, Hold, Fire, Move guest, Move table, Comp, Void. Undo is at the bottom of the screen after most actions. The only things that ask "why" are voids, comps, refunds and discounts.
+
+## Managers
+
+The Manager tab has today's live numbers (sales, open checks, guests, average check, table turn time, voids, comps, discounts, refunds, kitchen ticket time), sales by employee, category and hour, tips owed at close, closed checks with reprint and refund, every void and comp with its reason, an audit log of who did what, and a screen to hand several tables to another employee at shift change. Alerts show at the top for big voids, repeated voids, heavy comps, slow tickets and tables open too long.
+
+Settings has the menu (items, prices, photos, which choices each item asks), the choice groups themselves (required or optional, how many they can pick, extra charges), categories and their station and course, employees and roles, gift cards, tax and tip buttons.
+
+Roles: server, bartender, host, cook, manager, owner. Servers can do everything on the floor; voiding something already sent, comps, refunds and discounts ask for a manager PIN and are logged with who approved them.
+
+## Offline
+
+The app installs to the home screen (Add to Home Screen on iPad, Install on Android or Chrome) and keeps working without internet: orders, tickets, tabs, payments and printing all carry on. Sharing between tablets is the next step and needs the shared database.
 
 ## Files
 
 - `index.html` - the whole app
-- `images/` - draft beer pictures (supplied by Josh) and cocktail photos
+- `sw.js`, `manifest.json`, `icon.png` - what makes it installable and offline
+- `images/` - menu photos (draft beer pictures supplied by Josh; the rest are openly licensed photos from Wikimedia Commons, credits below)
+- `classic.html` - the earlier build
 
 ## Photo credits
 
@@ -55,7 +69,7 @@ Cropped from openly licensed photos on Wikimedia Commons:
 - Nachos - "Buffalo Nachos at Buffalo Bills" by pointnshoot, CC BY 2.0
 - Calamari - "Fried calamari" by Chensiyuan, CC BY-SA 3.0
 - Caesar salad - "Caesar Salad" by Prayitno, CC BY 2.0
-- Smash burger - "Cheeseburger with pickles", U.S. Department of Agriculture, public domain
+- Cheeseburger - "Cheeseburger with pickles", U.S. Department of Agriculture, public domain
 - Chicken sandwich - "Fried chicken Burger in Milan, Italy" by Pava, CC BY-SA 3.0 IT
 - Fish and chips - "Fish and chips at Sainsbury's Low Hall, Chingford, London" by Acabashi, CC BY-SA 4.0
 - Steak frites - "Steak frites at The Bar at MacArthur Place in Sonoma" by Sarah Stierch, CC BY 4.0

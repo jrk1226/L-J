@@ -1,0 +1,9 @@
+{
+  "name": "L&J Point of Sale",
+  "short_name": "L&J POS",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0E1116",
+  "theme_color": "#0E1116",
+  "icons": [{ "src": "icon.png", "sizes": "512x512", "type": "image/png" }]
+}
