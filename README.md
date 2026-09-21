@@ -10,6 +10,10 @@ The earlier, simpler build is still at https://jrk1226.github.io/L-J/classic.htm
 
 Two independent systems in one app. The switch sits under the L&J logo: Restaurant (dining room, bar and patio, full menu, kitchen stations) or Bar (strictly a bar: sixteen stools, open tabs, and a drinks-only menu of about 130 drinks - on tap, bottles and cans, cocktails, shots, liquor by the pour, wine, soft drinks, every one with a picture; no kitchen, drinks are rung up and poured). Each keeps its own floor, menu, checks and day; switching never mixes them.
 
+## How it looks
+
+Modelled on what the big systems do (Toast, Square, Lightspeed): a dark navigation rail with plain line icons, a light work area by default with a Dark look for dim rooms, the check on the left with the total and Send / Pay pinned at the bottom, the menu on the right with a search bar above it, category tabs each in their own colour, big photo tiles, and required choices marked red until picked and green once done. Everything a finger has to hit is at least 44 pixels.
+
 ## Bar workflow
 
 - **Quick sale** - a walk-up who pays now. Tap it, tap the drinks, "Ring up and pay", done. No stool, no tab.
