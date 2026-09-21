@@ -8,7 +8,7 @@ The earlier, simpler build is still at https://jrk1226.github.io/L-J/classic.htm
 
 ## Restaurant and Bar
 
-Two independent systems in one app. The switch sits under the L&J logo: Restaurant (dining room, bar and patio, full menu, kitchen stations) or Bar (bar rail, high tops, game room, a drinks-first menu with shots and bar food, one kitchen station). Each keeps its own floor, menu, checks and day; switching never mixes them.
+Two independent systems in one app. The switch sits under the L&J logo: Restaurant (dining room, bar and patio, full menu, kitchen stations) or Bar (strictly a bar: sixteen stools, open tabs, and a drinks-only menu - on tap, bottles and cans, cocktails, shots, liquor by the pour, wine, soft drinks; no kitchen, drinks are rung up and poured). Each keeps its own floor, menu, checks and day; switching never mixes them.
 
 ## Test PINs
 

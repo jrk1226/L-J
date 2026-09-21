@@ -837,6 +837,7 @@ const uid = () => Math.random().toString(36).slice(2, 9);
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const COURSES = { drink: "Drinks", app: "Apps", entree: "Entrees", dessert: "Dessert" };
 const STATES = { available: "Available", seated: "Seated", entered: "Order entered", sent: "Food sent", ready: "Food is up", served: "Food served", check: "Check requested", paid: "Paid" };
+if (VENUE === "bar") Object.assign(STATES, { available: "Open", entered: "Ordering", sent: "Drinks poured", ready: "Drinks up", served: "Drinks poured" });
 
 // ---------- sample data ----------
 function rng(seed) { let x = seed >>> 0; return () => { x ^= x << 13; x >>>= 0; x ^= x >>> 17; x ^= x << 5; x >>>= 0; return x / 4294967296; }; }
@@ -911,20 +912,27 @@ function seed() {
   ];
   const settings = { big: false, taxRate: 0.08875, tips: [18, 20, 22], bigVoid: 100, bigDiscount: 25 };
   if (VENUE === "bar") {
-    // the bar system: stools and high tops, a drinks-first menu, one kitchen station for bar food
-    stations.length = 0; stations.push({ id: "bar", name: "Bar" }, { id: "kitchen", name: "Kitchen" });
-    cats.length = 0; cats.push({ id: "drafts", name: "Beer", station: "bar", course: "drink" }, { id: "cocktails", name: "Cocktails", station: "bar", course: "drink" }, { id: "shots", name: "Shots", station: "bar", course: "drink" }, { id: "wine", name: "Wine", station: "bar", course: "drink" }, { id: "na", name: "Soft drinks", station: "bar", course: "drink" }, { id: "starters", name: "Bar food", station: "kitchen", course: "app" });
-    for (const it of items) { if (it.cat === "salads") it.cat = "starters"; if (it.cat === "burgers" || it.cat === "mains" || it.cat === "desserts") it.cat = "starters"; if (it.station === "fry") it.station = ""; }
-    const keepNames = new Set(["Bud Light", "Blue Point Toasted Lager", "Montauk Wave Chaser IPA", "Guinness", "Stella Artois", "Old Fashioned", "Margarita", "Espresso Martini", "Moscow Mule", "Aperol Spritz", "Well drink", "House red", "House white", "Prosecco", "Soda", "Sparkling water", "Wings (10)", "Mozzarella sticks", "Nachos", "Cheeseburger"]);
-    for (let i = items.length - 1; i >= 0; i--) if (!keepNames.has(items[i].name)) items.splice(i, 1);
-    add("shots", "Tequila shot", 8); add("shots", "Fireball", 7); add("shots", "Jameson", 9); add("shots", "Lemon drop", 8); add("shots", "Green tea shot", 9); add("shots", "Pickleback", 8);
-    add("cocktails", "Vodka soda", 10, { mods: ["mixer"] }); add("cocktails", "Tito's soda", 12); add("cocktails", "Jack and Coke", 11); add("cocktails", "Rum punch", 12);
-    add("drafts", "Bucket of 5 domestics", 25); add("drafts", "Coors Light", 6); add("drafts", "Corona", 7); add("drafts", "Michelob Ultra", 6);
-    add("starters", "Fries", 7); add("starters", "Pretzel with cheese", 10); add("starters", "Sliders (3)", 14, { mods: ["cheese"] });
+    // The bar system: no kitchen, no tables. A bar, its stools, and drinks.
+    stations.length = 0; stations.push({ id: "bar", name: "Bar" });
+    cats.length = 0; cats.push({ id: "tap", name: "On tap", station: "bar", course: "drink" }, { id: "bottles", name: "Bottles and cans", station: "bar", course: "drink" }, { id: "cocktails", name: "Cocktails", station: "bar", course: "drink" }, { id: "shots", name: "Shots", station: "bar", course: "drink" }, { id: "liquor", name: "Liquor", station: "bar", course: "drink" }, { id: "wine", name: "Wine", station: "bar", course: "drink" }, { id: "na", name: "Soft drinks", station: "bar", course: "drink" });
+    Object.assign(modGroups, Object.fromEntries([
+      G("pour", "How", false, 0, 1, ["Neat", "Rocks", "Up", { name: "Double", price: 5 }]),
+      G("mixer2", "Mixer", false, 0, 1, ["Soda", "Tonic", "Coke", "Diet Coke", "Ginger ale", "Cranberry", "Orange juice", "Pineapple", "Red Bull"]),
+      G("beersize", "Size", false, 0, 1, ["Pint", { name: "Pitcher", price: 14 }]),
+      G("shotcount", "How many", false, 0, 1, [{ name: "Round of 2", price: 0 }, { name: "Round of 4", price: 0 }]),
+      G("garnish", "Extras", false, 0, 2, ["Extra lime", "No ice", "Salt rim", "Sugar rim", { name: "Top shelf", price: 4 }]),
+    ]));
+    items.length = 0; n = 1;
+    add("tap", "Bud Light", 6, { img: "images/bud-light.png", mods: ["beersize"] }); add("tap", "Coors Light", 6, { mods: ["beersize"] }); add("tap", "Michelob Ultra", 6, { mods: ["beersize"] }); add("tap", "Blue Point Toasted Lager", 8, { img: "images/blue-point-toasted-lager.png", mods: ["beersize"] }); add("tap", "Montauk Wave Chaser IPA", 8, { img: "images/montauk-wave-chaser.png", mods: ["beersize"] }); add("tap", "Guinness", 8, { img: "images/guinness.png" }); add("tap", "Stella Artois", 8, { img: "images/stella-artois.png", mods: ["beersize"] }); add("tap", "Blue Moon", 7, { mods: ["beersize"] }); add("tap", "Sam Adams", 7, { mods: ["beersize"] }); add("tap", "IPA of the day", 8, { mods: ["beersize"] });
+    add("bottles", "Corona", 7); add("bottles", "Heineken", 7); add("bottles", "Miller Lite", 6); add("bottles", "Modelo", 7); add("bottles", "Budweiser", 6); add("bottles", "White Claw", 7); add("bottles", "High Noon", 8); add("bottles", "Truly", 7); add("bottles", "Bucket of 5 domestics", 25); add("bottles", "Bucket of 5 imports", 30); add("bottles", "Non-alcoholic beer", 6);
+    add("cocktails", "Old Fashioned", 14, { mods: ["pour", "garnish"], img: "images/old-fashioned.jpg", photo: true }); add("cocktails", "Margarita", 13, { mods: ["margstyle", "garnish"], img: "images/margarita.jpg", photo: true }); add("cocktails", "Espresso Martini", 15, { img: "images/espresso-martini.jpg", photo: true }); add("cocktails", "Moscow Mule", 13, { img: "images/moscow-mule.jpg", photo: true }); add("cocktails", "Aperol Spritz", 13, { img: "images/aperol-spritz.jpg", photo: true });
+    add("cocktails", "Vodka soda", 10, { mods: ["garnish"] }); add("cocktails", "Tito's soda", 12, { mods: ["garnish"] }); add("cocktails", "Gin and tonic", 11, { img: "images/well-drink.jpg", photo: true, mods: ["garnish"] }); add("cocktails", "Jack and Coke", 11); add("cocktails", "Rum and Coke", 10); add("cocktails", "Mojito", 13); add("cocktails", "Cosmopolitan", 13); add("cocktails", "Manhattan", 14, { mods: ["pour"] }); add("cocktails", "Negroni", 14); add("cocktails", "Whiskey Sour", 13); add("cocktails", "Long Island", 14); add("cocktails", "Paloma", 12); add("cocktails", "Bloody Mary", 12, { mods: ["garnish"] }); add("cocktails", "Mimosa", 10); add("cocktails", "Well drink", 9, { mods: ["liquor", "mixer2"] });
+    add("shots", "Tequila shot", 8, { mods: ["shotcount"] }); add("shots", "Fireball", 7, { mods: ["shotcount"] }); add("shots", "Jameson", 9, { mods: ["shotcount"] }); add("shots", "Lemon drop", 8, { mods: ["shotcount"] }); add("shots", "Green tea shot", 9, { mods: ["shotcount"] }); add("shots", "Pickleback", 8, { mods: ["shotcount"] }); add("shots", "Jager bomb", 9, { mods: ["shotcount"] }); add("shots", "Kamikaze", 8, { mods: ["shotcount"] }); add("shots", "Vegas bomb", 9, { mods: ["shotcount"] }); add("shots", "Casamigos", 12, { mods: ["shotcount"] }); add("shots", "Don Julio 1942", 25, { mods: ["shotcount"] });
+    add("liquor", "Tito's", 11, { mods: ["pour", "mixer2"] }); add("liquor", "Grey Goose", 13, { mods: ["pour", "mixer2"] }); add("liquor", "Ketel One", 12, { mods: ["pour", "mixer2"] }); add("liquor", "Bombay Sapphire", 12, { mods: ["pour", "mixer2"] }); add("liquor", "Hendrick's", 13, { mods: ["pour", "mixer2"] }); add("liquor", "Bacardi", 10, { mods: ["pour", "mixer2"] }); add("liquor", "Captain Morgan", 10, { mods: ["pour", "mixer2"] }); add("liquor", "Casamigos Blanco", 14, { mods: ["pour", "mixer2"] }); add("liquor", "Patron", 14, { mods: ["pour", "mixer2"] }); add("liquor", "Jack Daniel's", 11, { mods: ["pour", "mixer2"] }); add("liquor", "Jameson", 11, { mods: ["pour", "mixer2"] }); add("liquor", "Maker's Mark", 12, { mods: ["pour", "mixer2"] }); add("liquor", "Bulleit", 12, { mods: ["pour", "mixer2"] }); add("liquor", "Johnnie Walker Black", 14, { mods: ["pour", "mixer2"] }); add("liquor", "Hennessy", 14, { mods: ["pour", "mixer2"] }); add("liquor", "Baileys", 10, { mods: ["pour"] });
+    add("wine", "House red", 11, { mods: ["winesize"], img: "images/house-red.jpg", photo: true }); add("wine", "House white", 11, { mods: ["winesize"], img: "images/house-white.jpg", photo: true }); add("wine", "Pinot Grigio", 13, { mods: ["winesize"], img: "images/pinot-grigio.jpg", photo: true }); add("wine", "Cabernet", 14, { mods: ["winesize"], img: "images/cabernet.jpg", photo: true }); add("wine", "Rose", 12, { mods: ["winesize"] }); add("wine", "Prosecco", 12, { mods: ["winesize"], img: "images/prosecco.jpg", photo: true });
+    add("na", "Soda", 3, { mods: ["sodatype"], img: "images/soda.jpg", photo: true }); add("na", "Red Bull", 5); add("na", "Sparkling water", 4, { img: "images/sparkling-water.jpg", photo: true }); add("na", "Iced tea", 3.5, { img: "images/iced-tea.jpg", photo: true }); add("na", "Water", 0); add("na", "Coffee", 3, { img: "images/coffee.jpg", photo: true });
     tables.length = 0;
-    for (let i = 1; i <= 10; i++) tables.push({ id: "B" + i, label: "Bar " + i, seats: 1, zone: "Bar rail", x: 3 + (i - 1) * 9.6, y: 18, w: 8.6, h: 64, shape: "bar" });
-    tables.push({ id: "H1", label: "High top 1", seats: 4, zone: "Floor", x: 3, y: 10, w: 14, h: 80, shape: "round" }, { id: "H2", label: "High top 2", seats: 4, zone: "Floor", x: 21, y: 10, w: 14, h: 80, shape: "round" }, { id: "H3", label: "High top 3", seats: 4, zone: "Floor", x: 39, y: 10, w: 14, h: 80, shape: "round" }, { id: "H4", label: "High top 4", seats: 4, zone: "Floor", x: 57, y: 10, w: 14, h: 80, shape: "round" }, { id: "L1", label: "Lounge", seats: 8, zone: "Floor", x: 76, y: 10, w: 21, h: 80, shape: "sq" });
-    tables.push({ id: "G1", label: "Pool table", seats: 6, zone: "Game room", x: 3, y: 12, w: 30, h: 76, shape: "sq" }, { id: "G2", label: "Darts", seats: 4, zone: "Game room", x: 37, y: 12, w: 20, h: 76, shape: "sq" }, { id: "TO", label: "Takeout", seats: 0, zone: "Game room", x: 80, y: 12, w: 17, h: 76, shape: "sq" });
+    for (let i = 1; i <= 16; i++) tables.push({ id: "B" + i, label: "Stool " + i, seats: 1, zone: "Bar", x: 2 + ((i - 1) % 8) * 12.2, y: i <= 8 ? 8 : 56, w: 11, h: 36, shape: "bar" });
   }
   const giftCards = { "GIFT-1234": 50, "GIFT-5555": 120 };
 
@@ -949,7 +957,7 @@ function seed() {
   }
   closed.sort((a, b) => a.at - b.at);
   const L = (itemId, name, price, qty, guest, mods, note, status, kstatus, by) => ({ id: uid(), itemId, name, price, qty, guest, mods: mods || [], note: note || "", status, kstatus: kstatus || "", sentAt: status === "sent" ? Date.now() - 20 * 60000 : null, comp: null, paid: false, by, hold: status === "held" });
-  const T = (id) => (VENUE === "bar" ? { T4: "H1", B2: "B2", T1: "H3" }[id] || id : id);
+  const T = (id) => (VENUE === "bar" ? { T4: "B3", B2: "B7", T1: "B12" }[id] || id : id);
   const checks = {
     c1: { id: "c1", no: no++, tableId: T("T4"), tab: null, server: "s2", guests: 3, opened: Date.now() - 32 * 60000, touched: Date.now() - 12 * 60000, guestId: 3, allergy: "", requested: false, payments: [], parts: null, lines: [
       L("i29", "Steak frites", 34, 1, 1, [{ g: "temp", name: "Medium rare", price: 0 }], "", "sent", "served", "Sam"),
@@ -968,15 +976,21 @@ function seed() {
       L("i6", "Old Fashioned", 14, 2, 1, [{ g: "rocks", name: "Rocks", price: 0 }], "", "sent", "served", "Mike")] },
   };
   if (VENUE === "bar") {
-    checks.c1.lines = [L("i26", "Cheeseburger", 18, 1, 1, [{ g: "temp", name: "Medium", price: 0 }, { g: "side", name: "Fries", price: 0 }], "", "sent", "served", "Sam"), L("i26", "Cheeseburger", 18, 1, 2, [{ g: "temp", name: "Well done", price: 0 }, { g: "side", name: "Fries", price: 0 }], "", "sent", "served", "Sam"), L("i2", "Blue Point Toasted Lager", 8, 2, 3, [], "", "sent", "served", "Sam"), L("i21", "Wings (10)", 16, 1, 1, [{ g: "wingsauce", name: "BBQ", price: 0 }], "", "sent", "served", "Sam")];
-    checks.c3.lines = [L("i26", "Cheeseburger", 18, 1, 1, [{ g: "temp", name: "Medium", price: 0 }, { g: "toppings", name: "No onion", price: 0 }, { g: "addons", name: "Bacon", price: 3 }, { g: "side", name: "Fries", price: 0 }], "", "sent", "cooking", "Alex"), L("i23", "Nachos", 15, 1, 2, [], "", "sent", "cooking", "Alex"), L("i7", "Margarita", 13, 2, 2, [{ g: "margstyle", name: "Rocks", price: 0 }], "", "sent", "ready", "Alex")];
+    const byName = (nm) => items.find((x) => x.name === nm);
+    checks.c1.lines = [L(byName("Bud Light").id, "Bud Light", 6, 2, 1, [{ g: "beersize", name: "Pint", price: 0 }], "", "sent", "served", "Mike"), L(byName("Tito's").id, "Tito's", 11, 1, 1, [{ g: "pour", name: "Rocks", price: 0 }, { g: "mixer2", name: "Soda", price: 0 }], "", "sent", "served", "Mike"), L(byName("Fireball").id, "Fireball", 7, 2, 1, [], "", "sent", "served", "Mike")];
+    checks.c1.server = "s4"; checks.c1.guests = 1; checks.c1.guestId = 5;
+    checks.c2.lines = [L(byName("Blue Point Toasted Lager").id, "Blue Point Toasted Lager", 8, 1, 1, [{ g: "beersize", name: "Pint", price: 0 }], "", "new", "", "Mike")];
+    checks.c3.lines = [L(byName("Margarita").id, "Margarita", 13, 2, 1, [{ g: "margstyle", name: "Rocks", price: 0 }], "", "sent", "served", "Mike"), L(byName("Espresso Martini").id, "Espresso Martini", 15, 1, 1, [], "", "sent", "served", "Mike")];
+    checks.c3.server = "s4"; checks.c3.guests = 2; checks.c3.allergy = "";
+    checks.c4.lines = [L(byName("Old Fashioned").id, "Old Fashioned", 14, 2, 1, [{ g: "pour", name: "Rocks", price: 0 }], "", "sent", "served", "Mike"), L(byName("Jameson").id, "Jameson", 9, 2, 1, [], "", "sent", "served", "Mike")];
   }
   const tickets = [
     { id: 1, checkId: "c1", table: VENUE === "bar" ? "High top 1" : "Table 4", server: "Sam", station: VENUE === "bar" ? "kitchen" : "grill", at: Date.now() - 31 * 60000, status: "served", readyAt: Date.now() - 19 * 60000, lines: [{ lineId: checks.c1.lines[0].id, name: checks.c1.lines[0].name, qty: 1, guest: 1, mods: checks.c1.lines[0].mods.map((m) => m.name), note: "" }, { lineId: checks.c1.lines[1].id, name: checks.c1.lines[1].name, qty: 1, guest: 2, mods: checks.c1.lines[1].mods.map((m) => m.name), note: "" }], allergy: "" },
     { id: 2, checkId: "c3", table: VENUE === "bar" ? "High top 3" : "Table 1", server: "Alex", station: VENUE === "bar" ? "kitchen" : "grill", at: Date.now() - 9 * 60000, status: "cooking", readyAt: null, lines: [{ lineId: checks.c3.lines[0].id, name: "Cheeseburger", qty: 1, guest: 1, mods: ["Medium", "No onion", "Bacon", "Fries"], note: "" }], allergy: "Peanut" },
     { id: 3, checkId: "c3", table: VENUE === "bar" ? "High top 3" : "Table 1", server: "Alex", station: VENUE === "bar" ? "kitchen" : "cold", at: Date.now() - 9 * 60000, status: "cooking", readyAt: null, lines: [{ lineId: checks.c3.lines[1].id, name: checks.c3.lines[1].name, qty: 1, guest: 2, mods: checks.c3.lines[1].mods.map((m) => m.name), note: "" }], allergy: "Peanut" },
-    { id: 4, checkId: "c3", table: VENUE === "bar" ? "High top 3" : "Table 1", server: "Alex", station: "bar", at: Date.now() - 9 * 60000, status: "ready", readyAt: Date.now() - 2 * 60000, lines: [{ lineId: checks.c3.lines[2].id, name: "Margarita", qty: 2, guest: 2, mods: ["Rocks"], note: "" }], allergy: "" },
+    { id: 4, checkId: "c3", table: VENUE === "bar" ? "High top 3" : "Table 1", server: "Alex", station: "bar", at: Date.now() - 9 * 60000, status: "ready", readyAt: Date.now() - 2 * 60000, lines: [{ lineId: (checks.c3.lines[2] || checks.c3.lines[0]).id, name: "Margarita", qty: 2, guest: 2, mods: ["Rocks"], note: "" }], allergy: "" },
   ];
+  if (VENUE === "bar") tickets.length = 0;
   const favs = { s4: { i1: 40, i6: 22, i7: 18, i11: 31, i3: 15 }, s2: { i26: 20, i21: 14, i12: 12, i29: 9, i1: 8 }, s3: { i26: 12, i25: 10, i7: 9, i2: 8 } };
   return { v: 4, stations, cats, modGroups, items, staff, guests, tables, checks, tickets, closed, voids: [], audit: [], favs, settings, giftCards, nextNo: no, nextGuest: 6, nextTicket: 5, recentClosed: {} };
 }
@@ -1033,11 +1047,12 @@ function pinPad(padEl, dotsEl, onFull) {
 const lockPad = pinPad($("#pad"), $("#dots"), (v) => {
   const s = S.staff.find((x) => x.pin === v);
   if (!s) { lockPad.shake(); $("#lockmsg").textContent = "That PIN does not match anyone. Try again."; return; }
-  $("#lockmsg").textContent = "Tap your four numbers to clock in"; setMe(s); audit("Clocked in"); show(s.role === "cook" ? "kitchen" : s.role === "bartender" ? "tabs" : "floor"); toast("Hi " + s.name);
+  $("#lockmsg").textContent = "Tap your four numbers to clock in"; setMe(s); audit("Clocked in"); show(s.role === "cook" && VENUE !== "bar" ? "kitchen" : s.role === "bartender" && VENUE !== "bar" ? "tabs" : "floor"); toast("Hi " + s.name);
 });
 $("#lockbtn").onclick = () => { audit("Locked the screen"); setMe(null); };
 // the switch between the two systems
 document.title = "L&J Point of Sale - " + VENUES[VENUE];
+if (VENUE === "bar") { $("#tabs button[data-v=\"kitchen\"]").hidden = true; $("#tabs button[data-v=\"floor\"]").innerHTML = "<i>BR</i>Bar<span class='n' id='rcount'></span>"; $("#backfloor").textContent = "Bar"; $("#q").placeholder = "Search anything: a drink, a guest, a stool, a tab, a check number"; }
 $("#venuebtn").textContent = VENUES[VENUE];
 $("#venuebtn").onclick = async () => {
   const v = await pick("Which system?", "Two separate systems. Each keeps its own floor, menu and day.", Object.entries(VENUES).map(([k, n]) => ({ label: n + (k === VENUE ? " (you are here)" : ""), sub: k === "restaurant" ? "Dining room, bar and patio, full menu, kitchen stations" : "Bar rail, high tops, game room, drinks-first menu", value: k })));
@@ -1127,9 +1142,9 @@ function tableState(t) {
 }
 let mineOnly = false;
 function drawFloor() {
-  $("#legend").innerHTML = Object.entries(STATES).map(([k, v]) => "<span><i style='background:" + stateColor(k) + "'></i>" + v + "</span>").join("");
+  $("#legend").innerHTML = Object.entries(STATES).filter(([k]) => VENUE !== "bar" || (k !== "sent" && k !== "ready")).map(([k, v]) => "<span><i style='background:" + stateColor(k) + "'></i>" + v + "</span>").join("");
   const openN = Object.values(S.checks).length; const tabsN = Object.values(S.checks).filter((c) => !c.tableId).length;
-  $("#floortools").innerHTML = "<button class='btn sm" + (mineOnly ? " on" : "") + "' id='mineBtn'>My tables</button><button class='btn sm' id='openBtn'>Open checks: " + openN + "</button>" + (tabsN ? "<button class='btn sm' id='tabsBtn'>Bar tabs: " + tabsN + "</button>" : "") + (can("transfer") ? "<button class='btn sm' id='moveBtn'>Move a table</button>" : "");
+  $("#floortools").innerHTML = "<button class='btn sm" + (mineOnly ? " on" : "") + "' id='mineBtn'>" + (VENUE === "bar" ? "My stools" : "My tables") + "</button><button class='btn sm' id='openBtn'>Open checks: " + openN + "</button>" + (tabsN ? "<button class='btn sm' id='tabsBtn'>Bar tabs: " + tabsN + "</button>" : "") + (can("transfer") ? "<button class='btn sm' id='moveBtn'>" + (VENUE === "bar" ? "Move a stool" : "Move a table") + "</button>" : "");
   $("#mineBtn").onclick = () => { mineOnly = !mineOnly; drawFloor(); };
   $("#openBtn").onclick = openChecksSheet; const tb = $("#tabsBtn"); if (tb) tb.onclick = () => show("tabs"); const mb = $("#moveBtn"); if (mb) mb.onclick = () => moveTableFlow(null);
   drawReady();
@@ -1137,18 +1152,26 @@ function drawFloor() {
   const zones = [...new Set(S.tables.map((t) => t.zone))];
   for (const z of zones) {
     const h = document.createElement("div"); h.className = "zonehead"; h.textContent = z; W.appendChild(h);
-    const f = document.createElement("div"); f.className = "floor"; f.style.height = (z === "Bar" || z === "Bar rail" ? 150 : z === "Patio" || z === "Game room" || z === "Floor" ? 190 : 330) + "px";
+    const f = document.createElement("div"); f.className = "floor"; f.style.height = (VENUE === "bar" ? 300 : z === "Bar" ? 150 : z === "Patio" ? 170 : 330) + "px";
     for (const t of S.tables.filter((x) => x.zone === z)) {
       const c = checkOfTable(t.id); const st = tableState(t);
       if (mineOnly && (!c || c.server !== (me || {}).id)) continue;
       const b = document.createElement("button"); b.className = "tbl " + (t.shape === "round" ? "round" : t.shape === "bar" ? "bar" : "") + (c && me && c.server === me.id ? " mine" : "");
       b.dataset.st = st; b.dataset.t = t.id; b.style.left = t.x + "%"; b.style.top = t.y + "%"; b.style.width = t.w + "%"; b.style.height = t.h + "%";
       const who = c ? staffName(c.server) : "";
-      b.innerHTML = "<b>" + esc(t.label) + "</b>" + (c ? "<small>" + c.guests + (c.guests === 1 ? " guest" : " guests") + " &middot; " + esc(who) + "</small><small>" + mins(c.opened) + " min</small><span class='amt mono'>" + money(sums(c.lines).total) + "</span>" : "<small>" + (t.seats ? t.seats + " seats" : "phone and walk-up") + "</small>") + "<span class='st'>" + STATES[st] + "</span>";
+      b.innerHTML = "<b>" + esc(t.label) + "</b>" + (c ? "<small>" + c.guests + (c.guests === 1 ? " guest" : " guests") + " &middot; " + esc(who) + "</small><small>" + mins(c.opened) + " min</small><span class='amt mono'>" + money(sums(c.lines).total) + "</span>" : "<small>" + (VENUE === "bar" ? "open" : t.seats ? t.seats + " seats" : "phone and walk-up") + "</small>") + "<span class='st'>" + STATES[st] + "</span>";
       longPress(b, () => openTable(t.id), () => tableMenu(t.id));
       f.appendChild(b);
     }
     W.appendChild(f);
+  }
+  if (VENUE === "bar") {
+    const h = document.createElement("div"); h.className = "zonehead"; h.textContent = "Open tabs (not on a stool)"; W.appendChild(h);
+    const strip = document.createElement("div"); strip.className = "tabs-strip";
+    const tabs = Object.values(S.checks).filter((c) => !c.tableId).sort((a, b) => b.touched - a.touched);
+    strip.innerHTML = tabs.map((c) => "<button class='tabchip' data-c='" + c.id + "'><b>" + esc(c.tab.name || "No name") + "</b><small>" + [c.tab.card ? "card " + c.tab.card : "", c.tab.phone].filter(Boolean).join(" - ") + "</small><small class='mono'>" + money(checkTotals(c).total) + " - " + mins(c.opened) + " min - " + esc(staffName(c.server)) + "</small></button>").join("") + "<button class='tabchip add' id='newTabFloor'>+ Open a tab</button>";
+    strip.onclick = (e) => { const b = e.target.closest("button"); if (!b) return; if (b.id === "newTabFloor") return $("#newTab").click(); cur = b.dataset.c; curGuest = 1; show("order"); };
+    W.appendChild(strip);
   }
 }
 function stateColor(k) { return { available: "var(--faint)", seated: "var(--blue)", entered: "var(--amber)", sent: "var(--amber)", ready: "var(--green)", served: "var(--green)", check: "var(--purple)", paid: "var(--muted)" }[k]; }
@@ -1232,15 +1255,15 @@ function badgeFor(l) {
   if (l.comp) return "<span class='badge comp'>comp</span>";
   if (l.paid) return "<span class='badge paid'>paid</span>";
   if (l.status === "held") return "<span class='badge held'>on hold</span>";
-  if (l.status === "new") return "<span class='badge new'>not sent</span>";
+  if (l.status === "new") return "<span class='badge new'>" + (VENUE === "bar" ? "not rung" : "not sent") + "</span>";
   if (l.kstatus === "cooking") return "<span class='badge cooking'>cooking</span>";
   if (l.kstatus === "ready") return "<span class='badge ready'>ready</span>";
-  if (l.kstatus === "served") return "<span class='badge served'>served</span>";
+  if (l.kstatus === "served") return "<span class='badge served'>" + (VENUE === "bar" ? "poured" : "served") + "</span>";
   return "<span class='badge sent'>sent</span>";
 }
 function drawLines() {
   const c = curCheck(); const L = $("#lines"); L.innerHTML = "";
-  if (!c.lines.length) L.innerHTML = "<div class='empty'>Tap Guest 1, then tap what they want. Hold a line for more options.</div>";
+  if (!c.lines.length) L.innerHTML = "<div class='empty'>" + (VENUE === "bar" ? "Tap a drink. Hold a tile for a round. Hold a line for more options." : "Tap Guest 1, then tap what they want. Hold a line for more options.") + "</div>";
   for (let g = 1; g <= c.guests; g++) {
     const ls = c.lines.filter((l) => l.guest === g); if (!ls.length && c.lines.length) continue;
     if (c.guests > 1 || ls.length) { const h = document.createElement("div"); h.className = "ghead"; h.innerHTML = "<span>Guest " + g + "</span><span>" + money(sums(ls).sale) + "</span>"; h.dataset.guest = g;
@@ -1256,7 +1279,7 @@ function drawLines() {
   const s = checkTotals(c); const paid = paidSoFar(c); const T = $("#totals");
   T.innerHTML = c.lines.length ? "<div><span>Subtotal</span><span class='mono'>" + money(s.sale) + "</span></div>" + (s.disc ? "<div><span>Discount " + c.discount.pct + "%</span><span class='mono'>-" + money(s.disc) + "</span></div>" : "") + "<div><span>Tax</span><span class='mono'>" + money(s.tax) + "</span></div>" + (paid ? "<div><span>Paid so far</span><span class='mono'>-" + money(paid) + "</span></div>" : "") + "<div class='grand'><span>" + (paid ? "Still owed" : "Total") + "</span><span class='mono'>" + money(s.total - paid) + "</span></div>" : "";
   const unsent = c.lines.filter((l) => l.status === "new"); const held = c.lines.filter((l) => l.status === "held");
-  $("#btnSend").disabled = !unsent.length; $("#btnSend").textContent = unsent.length ? "Send " + unsent.length : "Send";
+  $("#btnSend").disabled = !unsent.length; $("#btnSend").textContent = VENUE === "bar" ? (unsent.length ? "Ring up " + unsent.length : "Ring up") : (unsent.length ? "Send " + unsent.length : "Send");
   const F = $("#firebar"); F.innerHTML = "";
   const heldCourses = [...new Set(held.map(lineCourse))];
   for (const co of heldCourses) { const b = document.createElement("button"); b.className = "btn"; const n = held.filter((l) => lineCourse(l) === co).length; b.textContent = "Fire " + COURSES[co].toLowerCase() + " (" + n + ")"; b.onclick = () => fireCourse(co); F.appendChild(b); }
@@ -1358,14 +1381,14 @@ function lineMenu(l) {
   const acts = [];
   acts.push({ k: "repeat", t: "Repeat", s: "Same thing again" });
   acts.push({ k: "modify", t: "Change it", s: "Choices, note" + (l.status === "new" ? ", how many" : "") });
-  if (l.status === "new") acts.push({ k: "hold", t: "Hold", s: "Do not send it yet" });
+  if (l.status === "new" && VENUE !== "bar") acts.push({ k: "hold", t: "Hold", s: "Do not send it yet" });
   if (l.status === "held") acts.push({ k: "fire", t: "Fire now", s: "Send it to the kitchen" });
   if (l.status === "new" && l.qty > 1) acts.push({ k: "less", t: "One less", s: "Take one off" });
   acts.push({ k: "guest", t: "Move guest", s: "Put it on someone else" });
   acts.push({ k: "table", t: "Move table", s: "Send it to another check" });
   if (!l.comp) acts.push({ k: "comp", t: "Comp", s: "Free, with a reason", danger: true });
-  if (l.status === "new" || l.status === "held") acts.push({ k: "remove", t: "Remove", s: "Not sent, so no harm done", danger: true });
-  else acts.push({ k: "void", t: "Void", s: "Already sent - needs a reason", danger: true });
+  if (l.status === "new" || l.status === "held") acts.push({ k: "remove", t: "Remove", s: VENUE === "bar" ? "Not rung yet, so no harm done" : "Not sent, so no harm done", danger: true });
+  else acts.push({ k: "void", t: "Void", s: VENUE === "bar" ? "Already poured - needs a reason" : "Already sent - needs a reason", danger: true });
   $("#lmacts").innerHTML = acts.map((a) => "<button class='btn " + (a.danger ? "danger" : "") + "' data-k='" + a.k + "'>" + a.t + "<small>" + a.s + "</small></button>").join("");
   openSheet("linemenu");
 }
@@ -1418,6 +1441,7 @@ function sendNow(only) {
   const c = curCheck(); const t = c.tableId ? tableOf(c.tableId) : null;
   const lines = (only || c.lines.filter((l) => l.status === "new")).filter((l) => !l.comp);
   if (!lines.length) return;
+  if (VENUE === "bar") { lines.forEach((l) => { l.status = "sent"; l.sentAt = Date.now(); l.kstatus = "served"; }); c.touched = Date.now(); save(); drawOrder(); toast("Rung up " + lines.length + (lines.length === 1 ? " drink" : " drinks"), true); return; }
   const byStation = {}; for (const l of lines) { const st = lineStation(l); (byStation[st] = byStation[st] || []).push(l); }
   const guestAllergy = c.guestId && (guestOf(c.guestId) || {}).allergy; const allergy = [...new Set([c.allergy, guestAllergy].filter(Boolean).flatMap((s) => s.split(",").map((x) => x.trim())).filter(Boolean).map((x) => x.toLowerCase()))].join(", ");
   for (const [st, ls] of Object.entries(byStation)) {
@@ -1668,7 +1692,7 @@ function drawTabs() {
   $("#tablist").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; if (b.id === "newTab2") return $("#newTab").click(); cur = b.dataset.c; curGuest = 1; show("order"); };
 }
 $("#tabq").oninput = drawTabs;
-$("#newTab").onclick = () => { $("#tbname").value = ""; $("#tbphone").value = ""; $("#tbcard").value = ""; $("#tbseat").innerHTML = "<button data-v='' class='on'>No seat</button>" + S.tables.filter((t) => t.zone === "Bar" && !checkOfTable(t.id)).map((t) => "<button data-v='" + t.id + "'>" + esc(t.label) + "</button>").join(""); openSheet("tabsheet"); setTimeout(() => $("#tbname").focus(), 60); };
+$("#newTab").onclick = () => { $("#tbname").value = ""; $("#tbphone").value = ""; $("#tbcard").value = ""; $("#tbseat").innerHTML = "<button data-v='' class='on'>No seat</button>" + S.tables.filter((t) => (t.zone === "Bar") && !checkOfTable(t.id)).map((t) => "<button data-v='" + t.id + "'>" + esc(t.label) + "</button>").join(""); openSheet("tabsheet"); setTimeout(() => $("#tbname").focus(), 60); };
 $("#tbseat").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; [...$("#tbseat").children].forEach((x) => x.classList.toggle("on", x === b)); };
 $("#tbopen").onclick = () => {
   const name = $("#tbname").value.trim(), phone = $("#tbphone").value.trim(), card = $("#tbcard").value.trim(); if (!name && !phone && !card) return toast("Give the tab a name, a phone or a card");
