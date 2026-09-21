@@ -133,10 +133,11 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 .item{border:0;background:var(--panel);border-radius:var(--r);padding:14px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:96px;box-shadow:inset 0 0 0 1px var(--line);transition:transform .08s;position:relative;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .item:hover{box-shadow:inset 0 0 0 1px var(--line2)}
 .item:active{transform:scale(.97)}
-.item.pic{min-height:150px}
-.item .art{position:relative;height:64px;margin:-4px -4px 2px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;overflow:hidden}
+.item.pic{min-height:168px}
+.item .art{position:relative;height:84px;margin:-4px -4px 2px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;overflow:hidden}
 .item .art svg{width:52px;height:52px;color:var(--ink)}
 .item .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:4px;background:#fff}
+.item .art img.cover{object-fit:cover;padding:0;background:transparent}
 .item b{font-size:14px;font-weight:800;line-height:1.25}
 .item .p{margin-top:auto;color:var(--amber);font-weight:700;font-size:14px}
 .item.out{opacity:.45}
@@ -659,12 +660,12 @@ function seed() {
   add("drafts", "Montauk Wave Chaser IPA", 8, { img: "images/montauk-wave-chaser.png", pour: "ipa" });
   add("drafts", "Guinness", 8, { img: "images/guinness.png", pour: "stout" });
   add("drafts", "Stella Artois", 8, { img: "images/stella-artois.png", pour: "pilsner" });
-  add("cocktails", "Old Fashioned", 14, { mods: ["Rocks", "Up", "Make it a double"] });
-  add("cocktails", "Margarita", 13, { mods: ["Rocks", "Frozen", "No salt", "Spicy"] });
-  add("cocktails", "Espresso Martini", 15);
-  add("cocktails", "Moscow Mule", 13);
-  add("cocktails", "Aperol Spritz", 13);
-  add("cocktails", "Well drink", 9, { mods: ["Vodka", "Gin", "Rum", "Tequila", "Whiskey", "Soda", "Tonic", "Cranberry"] });
+  add("cocktails", "Old Fashioned", 14, { mods: ["Rocks", "Up", "Make it a double"], img: "images/old-fashioned.jpg", photo: true });
+  add("cocktails", "Margarita", 13, { mods: ["Rocks", "Frozen", "No salt", "Spicy"], img: "images/margarita.jpg", photo: true });
+  add("cocktails", "Espresso Martini", 15, { img: "images/espresso-martini.jpg", photo: true });
+  add("cocktails", "Moscow Mule", 13, { img: "images/moscow-mule.jpg", photo: true });
+  add("cocktails", "Aperol Spritz", 13, { img: "images/aperol-spritz.jpg", photo: true });
+  add("cocktails", "Well drink", 9, { mods: ["Vodka", "Gin", "Rum", "Tequila", "Whiskey", "Soda", "Tonic", "Cranberry"], img: "images/well-drink.jpg", photo: true });
   add("wine", "House red", 11); add("wine", "House white", 11); add("wine", "Pinot Grigio", 13); add("wine", "Cabernet", 14); add("wine", "Prosecco", 12);
   add("na", "Soda", 3, { mods: ["Coke", "Diet Coke", "Sprite", "Ginger ale"] }); add("na", "Iced tea", 3.5); add("na", "Coffee", 3); add("na", "Sparkling water", 4);
   add("starters", "Wings (10)", 16, { mods: ["Mild", "Hot", "BBQ", "Extra blue cheese"] });
@@ -725,7 +726,9 @@ function seed() {
   return { v: 3, cats, items, staff, guests, seats, checks, kitchen, closed, voids: [], recent: ["i1", "i18", "i23", "i6"], settings, nextNo: no, nextGuest: 6, nextTicket: 4 };
 }
 let S = load();
-function load() { try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 3) return s; } } catch (e) {} return seed(); }
+function load() { try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 3) return refresh(s); } } catch (e) {} return seed(); }
+// pictures added to the sample menu later reach menus already saved on a device
+function refresh(s) { const sd = seed(); for (const it of s.items) { if (it.img) continue; const m = sd.items.find((x) => x.name === it.name && x.img); if (m) { it.img = m.img; it.photo = m.photo; } } return s; }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
 // ---------- lookups ----------
@@ -808,7 +811,7 @@ function art(it) {
   if (!it.img && !it.pour) return "";
   const c = POURS[it.pour] || POURS.amber;
   const svg = it.pour ? "<svg viewBox='0 0 64 64' aria-hidden='true'><path d='M18 12h28l-3 42a4 4 0 0 1-4 4H25a4 4 0 0 1-4-4z' fill='rgba(255,255,255,.06)' stroke='currentColor' stroke-opacity='.35' stroke-width='1.5'/><path d='M21.5 22h21l-2.4 32a2 2 0 0 1-2 2H25.9a2 2 0 0 1-2-2z' fill='" + c.beer + "'/><path d='M20.6 13.5h22.8l-.9 9.5H21.5z' fill='" + c.head + "'/></svg>" : "";
-  return "<span class='art'>" + svg + (it.img ? "<img src='" + esc(it.img) + "' alt='' loading='lazy' onerror='this.remove()'>" : "") + "</span>";
+  return "<span class='art'>" + svg + (it.img ? "<img src='" + esc(it.img) + "' alt='' loading='lazy'" + (it.photo ? " class='cover'" : "") + " onerror='this.remove()'>" : "") + "</span>";
 }
 
 // ============================================================
@@ -1292,7 +1295,7 @@ $("#iphotoclear").onclick = () => { photoData = ""; $("#iphoto").value = ""; toa
 $("#iout").onclick = () => $("#iout").classList.toggle("on");
 $("#isave").onclick = () => {
   const name = $("#iname").value.trim(); const price = Number($("#iprice").value); if (!name) return toast("Give it a name"); if (isNaN(price) || price < 0) return toast("Check the price");
-  const data = { name, price, cat: $("#icat").value, mods: $("#imods").value.split(",").map((x) => x.trim()).filter(Boolean), out: $("#iout").classList.contains("on"), img: photoData || "" };
+  const data = { name, price, cat: $("#icat").value, mods: $("#imods").value.split(",").map((x) => x.trim()).filter(Boolean), out: $("#iout").classList.contains("on"), img: photoData || "", photo: !!photoData && !(editItem && editItem.img === photoData && !editItem.photo) };
   if (editItem) Object.assign(editItem, data); else S.items.push(Object.assign({ id: "i" + Date.now(), pour: "" }, data));
   closeSheet("itemsheet"); save(); drawSettings(); toast(name + " saved");
 };

@@ -29,4 +29,15 @@ Managers can change these under Settings.
 ## Files
 
 - `index.html` - the whole app
-- `images/` - draft beer pictures
+- `images/` - draft beer pictures (supplied by Josh) and cocktail photos
+
+## Cocktail photo credits
+
+Cropped from openly licensed photos on Wikimedia Commons:
+
+- Old Fashioned - "Old fashioned orange slice cocktail ice cubes straw on table" by Personal Creations, CC BY 2.0
+- Margarita - "Margarita with lime in a margarita glass" by Evan Swigart, CC BY 2.0
+- Espresso Martini - "Espresso martini - November 2024" by Sarah Stierch, CC0
+- Moscow Mule - "Moscow Mule at Rye, San Francisco", CC BY-SA 3.0
+- Aperol Spritz - "Aperol Spritz - July 2024" by Sarah Stierch, CC0
+- Well drink - "Gin and tonic with lime" by NotFromUtrecht, CC BY-SA 3.0
