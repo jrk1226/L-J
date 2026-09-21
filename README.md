@@ -19,10 +19,10 @@ Next steps when it is worth building for real: a database so checks and guests a
 
 Drop a photo into the `images` folder with one of these names and the tile picks it up on its own (until then the tile draws a pint of the right colour):
 
-- `images/bud-light.jpg`
-- `images/blue-point-toasted-lager.jpg`
-- `images/montauk-wave-chaser.jpg`
-- `images/guinness.jpg`
-- `images/stella-artois.jpg`
+- `images/bud-light.png` (in place)
+- `images/blue-point-toasted-lager.png` (in place)
+- `images/montauk-wave-chaser.png` (in place)
+- `images/guinness.png` (in place)
+- `images/stella-artois.png` (in place)
 
 Any square-ish photo works; it is cropped to fit. Use photos you have the rights to - your distributor's product sheets are the usual source.
