@@ -47,8 +47,9 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 :root[data-big] body{font-size:17px}
 :root[data-big] .btn{min-height:58px;font-size:16px}
 :root[data-big] .item{min-height:128px}
-:root[data-big] .item.pic{min-height:178px}
-:root[data-big] .cats button{padding:14px 18px;font-size:15px}
+:root[data-big] .menu{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+:root[data-big] .item b{font-size:17px}
+:root[data-big] .cats button{padding:15px 20px;font-size:16.5px}
 :root[data-big] .line{padding:14px 14px}
 :root[data-big] .pad button{height:74px;font-size:26px}
 
@@ -208,24 +209,26 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 /* ---- menu side ---- */
 .menuwrap{min-width:0}
 .cats{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
-.cats button,.chips button{border:0;background:var(--panel);color:var(--ink2);border-radius:999px;padding:11px 16px;font-weight:700;font-size:14px;white-space:nowrap;box-shadow:inset 0 0 0 1px var(--line)}
+.cats button,.chips button{border:0;background:var(--panel);color:var(--ink2);border-radius:999px;padding:12px 18px;font-weight:800;font-size:15px;line-height:1;white-space:nowrap;box-shadow:inset 0 0 0 1.5px var(--line2)}
+.cats{gap:8px;margin:0 0 14px}
 .cats button.on,.chips button.on{background:var(--amber);color:var(--amber-ink);box-shadow:none}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
 .chips button.req{box-shadow:inset 0 0 0 1px var(--amber)}
-.menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-.item{border:0;background:var(--panel);border-radius:var(--r);padding:12px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:104px;box-shadow:inset 0 0 0 1px var(--line);transition:transform .08s;position:relative;user-select:none;-webkit-user-select:none}
+.menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.item{border:0;background:var(--panel);border-radius:var(--r);padding:12px;text-align:left;display:flex;flex-direction:column;gap:8px;min-height:104px;box-shadow:inset 0 0 0 1px var(--line);transition:transform .08s;position:relative;user-select:none;-webkit-user-select:none}
 .item:hover{box-shadow:inset 0 0 0 1px var(--line2)}
 .item:active{transform:scale(.97)}
-.item.pic{min-height:170px}
-.item .art{position:relative;height:84px;margin:-2px -2px 2px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;overflow:hidden}
+.item.pic{min-height:0}
+.item .art{position:relative;aspect-ratio:1/1;width:100%;margin:0 0 2px;border-radius:12px;background:var(--panel2);display:grid;place-items:center;overflow:hidden}
 .item .art svg{width:52px;height:52px;color:var(--ink)}
-.item .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:4px;background:#fff}
+.item .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:8px;background:#fff}
 .item .art img.cover{object-fit:cover;padding:0;background:transparent}
-.item b{font-size:14.5px;font-weight:800;line-height:1.25}
-.item .p{margin-top:auto;color:var(--amber);font-weight:700;font-size:14px}
+.item b{font-size:15.5px;font-weight:800;line-height:1.25}
+.item .p{margin-top:auto;color:var(--amber);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:space-between;gap:6px}
 .item.out{opacity:.45}
 .item.out::after{content:"86'd";position:absolute;top:10px;right:10px;background:var(--red);color:#fff;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px}
-.item .hold{position:absolute;bottom:10px;right:10px;font-size:10px;color:var(--faint);font-weight:700}
+.item .hold{font-family:"Manrope",system-ui,sans-serif;font-variant-numeric:normal;font-size:11px;font-weight:800;color:var(--ink2);background:var(--raise);padding:4px 9px;border-radius:999px;white-space:nowrap}
+.item .hold.ask{background:var(--amber-soft);color:var(--amber)}
 .item .fav{position:absolute;top:8px;left:8px;font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--amber);background:var(--amber-soft);padding:2px 7px;border-radius:999px}
 
 /* ---- sheets ---- */
@@ -1349,7 +1352,7 @@ function drawMenu() {
   if (!list.length) m.innerHTML = "<div class='empty' style='grid-column:1/-1'>" + (mq ? "Nothing on the menu matches that." : cat === "fav" ? "Favorites fill in on their own as you ring things up." : "Nothing here yet.") + "</div>";
   for (const it of list) {
     const b = document.createElement("button"); b.className = "item" + (it.img ? " pic" : "") + (it.out ? " out" : "");
-    b.innerHTML = (it.img ? "<span class='art'><img src='" + esc(it.img) + "' alt='' loading='lazy'" + (it.photo ? " class='cover'" : "") + " onerror='this.remove()'></span>" : "") + "<b>" + esc(it.name) + "</b><span class='p mono'>" + money(it.price) + "</span><span class='hold'>" + (it.mods.length ? "asks " + it.mods.length + (it.mods.length === 1 ? " thing" : " things") : "one tap") + "</span>";
+    b.innerHTML = (it.img ? "<span class='art'><img src='" + esc(it.img) + "' alt='' loading='lazy'" + (it.photo ? " class='cover'" : "") + " onerror='this.remove()'></span>" : "") + "<b>" + esc(it.name) + "</b><span class='p mono'>" + money(it.price) + "<span class='hold" + (it.mods.length ? " ask" : "") + "'>" + (it.mods.length ? "Choices" : "One tap") + "</span></span>";
     longPress(b, () => tapItem(it), () => itemHoldMenu(it)); m.appendChild(b);
   }
 }
