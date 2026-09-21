@@ -14,3 +14,15 @@ What is in it:
 - End of day: checks closed, sales, tips, tax, cards vs cash, top sellers
 
 Next steps when it is worth building for real: a database so checks and guests are kept, logins for staff, a card reader, and a printer for kitchen tickets.
+
+## Pictures on the menu tiles
+
+Drop a photo into the `images` folder with one of these names and the tile picks it up on its own (until then the tile draws a pint of the right colour):
+
+- `images/bud-light.jpg`
+- `images/blue-point-toasted-lager.jpg`
+- `images/montauk-wave-chaser.jpg`
+- `images/guinness.jpg`
+- `images/stella-artois.jpg`
+
+Any square-ish photo works; it is cropped to fit. Use photos you have the rights to - your distributor's product sheets are the usual source.

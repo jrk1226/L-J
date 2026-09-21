@@ -96,6 +96,10 @@ h2{font-size:22px;font-weight:800;letter-spacing:-.01em;margin:0}
 .item{border:0;background:var(--panel);border-radius:var(--r);padding:14px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:96px;box-shadow:inset 0 0 0 1px var(--line);transition:transform .08s}
 .item:hover{box-shadow:inset 0 0 0 1px var(--line2)}
 .item:active{transform:scale(.97)}
+.item.pic{min-height:150px}
+.item .art{position:relative;height:64px;margin:-4px -4px 2px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;overflow:hidden}
+.item .art svg{width:52px;height:52px;color:var(--ink)}
+.item .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .item b{font-size:14px;font-weight:800;line-height:1.25}
 .item .p{margin-top:auto;color:var(--amber);font-weight:700;font-size:14px}
 .ticket{background:var(--panel);border-radius:var(--r);box-shadow:inset 0 0 0 1px var(--line);display:flex;flex-direction:column;overflow:hidden;position:sticky;top:16px;max-height:calc(100vh - 32px)}
@@ -346,7 +350,13 @@ h2{font-size:22px;font-weight:800;letter-spacing:-.01em;margin:0}
 // ---------- sample data ----------
 const TAX = 0.08875;
 const MENU = {
-  "Drafts": [["Bud Light", 6], ["Blue Point Toasted Lager", 8], ["Montauk Wave Chaser IPA", 8], ["Guinness", 8], ["Stella Artois", 8]],
+  "Drafts": [
+    ["Bud Light", 6, { img: "images/bud-light.jpg", pour: "light" }],
+    ["Blue Point Toasted Lager", 8, { img: "images/blue-point-toasted-lager.jpg", pour: "amber" }],
+    ["Montauk Wave Chaser IPA", 8, { img: "images/montauk-wave-chaser.jpg", pour: "ipa" }],
+    ["Guinness", 8, { img: "images/guinness.jpg", pour: "stout" }],
+    ["Stella Artois", 8, { img: "images/stella-artois.jpg", pour: "pilsner" }],
+  ],
   "Cocktails": [["Old Fashioned", 14], ["Margarita", 13], ["Espresso Martini", 15], ["Moscow Mule", 13], ["Aperol Spritz", 13], ["Well drink", 9]],
   "Wine": [["House red", 11], ["House white", 11], ["Pinot Grigio", 13], ["Cabernet", 14], ["Prosecco", 12]],
   "Non-alcoholic": [["Soda", 3], ["Iced tea", 3.5], ["Coffee", 3], ["Sparkling water", 4]],
@@ -380,6 +390,26 @@ kitchen.push({ id: 2, seat: "Table 1", at: Date.now() - 9 * 60000, items: [{ nam
 closed.push({ no: 1038, seat: "Table 2", guest: "Dana Whitfield", sale: 47.00, tax: 4.17, tip: 10.00, method: "Card", at: Date.now() - 95 * 60000, lines: [{ name: "Aperol Spritz", qty: 2, price: 13 }, { name: "Nachos", qty: 1, price: 15 }, { name: "Soda", qty: 2, price: 3 }] });
 closed.push({ no: 1039, seat: "Bar 1", guest: "walk-in", sale: 30.00, tax: 2.66, tip: 6.00, method: "Cash", at: Date.now() - 70 * 60000, lines: [{ name: "Guinness", qty: 3, price: 8 }] });
 closed.push({ no: 1040, seat: "Takeout", guest: "Priya Nair", sale: 37.00, tax: 3.28, tip: 0, method: "Card", at: Date.now() - 40 * 60000, lines: [{ name: "Margherita pie", qty: 1, price: 20 }, { name: "Chicken sandwich", qty: 1, price: 17 }] });
+
+// ---------- pictures on the tiles ----------
+// A real photo is used when images/<file> exists in the repo. Until then the
+// tile draws a pint of the right colour so the row is never blank.
+const POURS = {
+  light:   { beer: "#F8E39A", head: "#FFF8E1" },
+  pilsner: { beer: "#F3C94F", head: "#FFF6DC" },
+  amber:   { beer: "#C9782A", head: "#F7E9CF" },
+  ipa:     { beer: "#E29A3B", head: "#FBEFD8" },
+  stout:   { beer: "#1B1412", head: "#E9DCC6" },
+};
+function pourArt(opt) {
+  const c = POURS[opt.pour] || POURS.amber;
+  const svg = "<svg viewBox='0 0 64 64' aria-hidden='true'>" +
+    "<path d='M18 12h28l-3 42a4 4 0 0 1-4 4H25a4 4 0 0 1-4-4z' fill='rgba(255,255,255,.06)' stroke='currentColor' stroke-opacity='.35' stroke-width='1.5'/>" +
+    "<path d='M21.5 22h21l-2.4 32a2 2 0 0 1-2 2H25.9a2 2 0 0 1-2-2z' fill='" + c.beer + "'/>" +
+    "<path d='M20.6 13.5h22.8l-.9 9.5H21.5z' fill='" + c.head + "'/>" +
+    "<path d='M24 26l1.6 26' stroke='rgba(255,255,255,.35)' stroke-width='2' stroke-linecap='round'/></svg>";
+  return "<span class='art'>" + svg + (opt.img ? "<img src='" + esc(opt.img) + "' alt='' loading='lazy' onerror=\"this.remove()\">" : "") + "</span>";
+}
 
 // ---------- helpers ----------
 const $ = (s) => document.querySelector(s);
@@ -440,7 +470,11 @@ function drawOrder() {
   const cats = $("#cats"); cats.innerHTML = "";
   for (const k of Object.keys(MENU)) { const b = document.createElement("button"); b.textContent = k; b.className = k === cat ? "on" : ""; b.onclick = () => { cat = k; drawOrder(); }; cats.appendChild(b); }
   const m = $("#menu"); m.innerHTML = "";
-  for (const [name, price] of MENU[cat]) { const b = document.createElement("button"); b.className = "item"; b.innerHTML = "<b>" + esc(name) + "</b><span class='p mono'>" + money(price) + "</span>"; b.onclick = () => addLine(name, price); m.appendChild(b); }
+  for (const [name, price, opt] of MENU[cat]) {
+    const b = document.createElement("button"); b.className = "item" + (opt ? " pic" : "");
+    b.innerHTML = (opt ? pourArt(opt) : "") + "<b>" + esc(name) + "</b><span class='p mono'>" + money(price) + "</span>";
+    b.onclick = () => addLine(name, price); m.appendChild(b);
+  }
   const gp = $("#guestpick"); gp.innerHTML = "<option value=''>Walk-in guest</option>" + guests.map((g) => "<option value='" + g.id + "'>" + esc(g.name) + "</option>").join("");
   drawTicket();
 }
