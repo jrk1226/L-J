@@ -141,9 +141,37 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 .tbl.sel{outline:3px solid var(--amber);outline-offset:2px}
 .tbl.mine::before{content:"";position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--amber)}
 .tbl.round.mine::before{top:10px;right:22%}
+
+/* Bar venue: a drawn bar with numbered stools along it */
+.barroom{background:var(--panel);border-radius:var(--r);box-shadow:inset 0 0 0 1px var(--line);padding:14px 14px 18px;margin-bottom:6px}
+.backbar{height:46px;border-radius:10px 10px 0 0;background:linear-gradient(180deg,#2a1d12,#3a2818);box-shadow:inset 0 -3px 0 rgba(0,0,0,.35);position:relative;overflow:hidden}
+.backbar::before{content:"";position:absolute;left:18px;right:18px;top:10px;height:26px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 9px,transparent 9px 22px,rgba(245,165,36,.35) 22px 31px,transparent 31px 44px);border-radius:4px;opacity:.9}
+.backbar span{position:absolute;right:14px;top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:rgba(255,255,255,.55)}
+.counter{height:58px;border-radius:0 0 16px 16px;background:linear-gradient(180deg,#8a5a2b,#6b4320 55%,#4e2f16);box-shadow:0 6px 0 #2e1c0d,0 10px 18px rgba(0,0,0,.35);display:grid;place-items:center;margin-bottom:26px;position:relative}
+.counter b{color:#f6e7c9;font-size:16px;letter-spacing:.32em;text-transform:uppercase;font-weight:800;opacity:.9}
+.stools{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 6px;padding:0 6px}
+.tbl.stool{position:relative;background:transparent;box-shadow:none;padding:0;flex:1 1 62px;min-width:62px;max-width:104px;align-items:center;text-align:center;gap:3px;opacity:1}
+.tbl.stool .seat{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--panel2),var(--raise));box-shadow:inset 0 0 0 3px var(--line2),0 4px 0 var(--line);display:grid;place-items:center;font-size:26px;font-weight:800;color:var(--ink);position:relative}
+.tbl.stool .seat::after{content:"";position:absolute;left:50%;bottom:-16px;width:10px;height:14px;margin-left:-5px;background:var(--line2);border-radius:0 0 3px 3px;z-index:-1}
+.tbl.stool small{font-size:11px;line-height:1.2;margin-top:6px;width:100%;white-space:normal}
+.tbl.stool .amt{margin-top:0;font-size:12px}
+.tbl.stool .st{font-size:8.5px}
+.tbl.stool[data-st]{box-shadow:none;background:transparent;opacity:1;animation:none}
+.tbl.stool[data-st="available"] .seat{opacity:.75}
+.tbl.stool[data-st="seated"] .seat{box-shadow:inset 0 0 0 3px var(--blue),0 4px 0 var(--line)}
+.tbl.stool[data-st="entered"] .seat{box-shadow:inset 0 0 0 3px var(--amber),0 4px 0 var(--line);background:radial-gradient(circle at 35% 30%,var(--amber-soft),var(--raise))}
+.tbl.stool[data-st="sent"] .seat,.tbl.stool[data-st="served"] .seat{box-shadow:inset 0 0 0 3px var(--green),0 4px 0 var(--line)}
+.tbl.stool[data-st="ready"] .seat{box-shadow:inset 0 0 0 4px var(--green),0 4px 0 var(--line);animation:blink 1.4s infinite}
+.tbl.stool[data-st="check"] .seat{box-shadow:inset 0 0 0 3px var(--purple),0 4px 0 var(--line);background:radial-gradient(circle at 35% 30%,rgba(192,132,252,.25),var(--raise))}
+.tbl.stool[data-st="paid"] .seat{box-shadow:inset 0 0 0 3px var(--muted),0 4px 0 var(--line);opacity:.6}
+.tbl.stool.sel .seat{outline:3px solid var(--amber);outline-offset:2px}
+.tbl.stool.sel{outline:none}
+.tbl.stool.mine::before{top:2px;right:6px}
+:root[data-big] .tbl.stool{width:92px}:root[data-big] .tbl.stool .seat{width:80px;height:80px;font-size:32px}
 @media (max-width:820px){
   .floor{height:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:10px;background-image:none}
-  .tbl{position:static!important;width:auto!important;height:auto!important;min-height:104px;border-radius:14px!important;text-align:left;align-items:flex-start}
+  .tbl:not(.stool){position:static!important;width:auto!important;height:auto!important;min-height:104px;border-radius:14px!important;text-align:left;align-items:flex-start}
+  .stools{justify-content:center;gap:14px 10px}
 }
 .tabs-strip{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
 .tabchip{border:0;background:var(--panel);box-shadow:inset 0 0 0 1px var(--line);border-radius:12px;padding:10px 14px;text-align:left;display:grid;gap:2px;min-width:140px}
@@ -1199,7 +1227,25 @@ function drawFloor() {
   $("#openBtn").onclick = openChecksSheet; const tb = $("#tabsBtn"); if (tb) tb.onclick = () => show("tabs"); const mb = $("#moveBtn"); if (mb) mb.onclick = () => moveTableFlow(null);
   drawReady();
   const W = $("#floorwrap"); W.innerHTML = "";
-  const zones = [...new Set(S.tables.map((t) => t.zone))];
+  const zones = VENUE === "bar" ? [] : [...new Set(S.tables.map((t) => t.zone))];
+  if (VENUE === "bar") {
+    // The bar itself: back bar, the counter, and a numbered stool for every seat along it.
+    const room = document.createElement("div"); room.className = "barroom";
+    room.innerHTML = "<div class='backbar'><span>Back bar</span></div><div class='counter'><b>Bar</b></div>";
+    const row = document.createElement("div"); row.className = "stools";
+    for (const t of S.tables) {
+      const c = checkOfTable(t.id); const st = tableState(t);
+      if (mineOnly && (!c || c.server !== (me || {}).id)) continue;
+      const b = document.createElement("button"); b.className = "tbl stool" + (c && me && c.server === me.id ? " mine" : "");
+      b.dataset.st = st; b.dataset.t = t.id;
+      const num = (t.label.match(/\d+/) || [t.label])[0];
+      b.innerHTML = "<span class='seat'>" + esc(num) + "</span>" + (c ? "<small>" + esc(staffName(c.server)) + " &middot; " + mins(c.opened) + " min</small><span class='amt mono'>" + money(sums(c.lines).total) + "</span>" : "<small>&nbsp;</small>") + "<span class='st'>" + STATES[st] + "</span>";
+      b.title = t.label;
+      longPress(b, () => openTable(t.id), () => tableMenu(t.id));
+      row.appendChild(b);
+    }
+    room.appendChild(row); W.appendChild(room);
+  }
   for (const z of zones) {
     const h = document.createElement("div"); h.className = "zonehead"; h.textContent = z; W.appendChild(h);
     const f = document.createElement("div"); f.className = "floor"; f.style.height = (VENUE === "bar" ? 300 : z === "Bar" ? 150 : z === "Patio" ? 170 : 330) + "px";
