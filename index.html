@@ -245,6 +245,10 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 .kt li b{color:var(--amber)}
 .kt li small{grid-column:2;color:var(--muted);font-weight:600}
 .kt .acts{grid-template-columns:auto 1fr;padding:6px 12px 12px}
+.kt.done{opacity:.85}
+.kt.done .h .tm{color:var(--muted);font-size:12px}
+.kt .when{padding:0 14px 8px;color:var(--muted);font-size:12px;font-weight:600}
+.head .btn.on{background:var(--ink);color:var(--bg)}
 
 /* ---- tables (guests, reports) ---- */
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
@@ -386,13 +390,15 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 
     <!-- KITCHEN -->
     <section class="view" id="v-kitchen">
-      <div class="head"><div><h2>Kitchen</h2><div class="sub">Food only. Every Send lands here. Amber after 8 minutes, red after 12.</div></div></div>
+      <div class="head"><div><h2>Kitchen</h2><div class="sub">Food only. Every Send lands here. Amber after 8 minutes, red after 12.</div></div><button class="btn" id="khist">History</button></div>
+      <div class="toolbar" id="ksearchwrap" hidden><input id="ksearch" placeholder="Look up a ticket by table or item"></div>
       <div class="kds" id="kds"></div>
     </section>
 
     <!-- BAR -->
     <section class="view" id="v-bar">
-      <div class="head"><div><h2>Bar</h2><div class="sub">Drinks only. When a server sends a round, it shows up here, not in the kitchen. Amber after 5 minutes, red after 8.</div></div></div>
+      <div class="head"><div><h2>Bar</h2><div class="sub">Drinks only. When a server sends a round, it shows up here, not in the kitchen. Amber after 5 minutes, red after 8.</div></div><button class="btn" id="bhist">History</button></div>
+      <div class="toolbar" id="bsearchwrap" hidden><input id="bsearch" placeholder="Look up a ticket by table or item"></div>
       <div class="kds" id="bds"></div>
     </section>
 
@@ -712,7 +718,7 @@ function seed() {
       { id: uid(), itemId: "i18", name: "Wings (10)", price: 16, qty: 1, seat: 1, mods: ["Hot"], note: "", sent: false, paid: false, by: "Alex" }] },
   };
   const kitchen = [
-    { id: 1, seat: "Table 4", at: Date.now() - 31 * 60000, items: [{ name: "Calamari", qty: 1, note: "extra lemon", mods: [], seat: 1 }, { name: "Steak frites", qty: 2, note: "", mods: ["Medium rare"], seat: 1 }], done: true, kind: "Kitchen" },
+    { id: 1, seat: "Table 4", at: Date.now() - 31 * 60000, items: [{ name: "Calamari", qty: 1, note: "extra lemon", mods: [], seat: 1 }, { name: "Steak frites", qty: 2, note: "", mods: ["Medium rare"], seat: 1 }], done: true, readyAt: Date.now() - 19 * 60000, pickedUp: true, kind: "Kitchen", by: "Sam" },
     { id: 2, seat: "Table 1", at: Date.now() - 9 * 60000, items: [{ name: "Smash burger", qty: 2, note: "one no onions", mods: ["Medium"], seat: 1 }, { name: "Caesar salad", qty: 1, note: "", mods: [], seat: 2 }], done: false, kind: "Kitchen", by: "Sam" },
     { id: 3, seat: "Bar 3", at: Date.now() - 3 * 60000, items: [{ name: "Old Fashioned", qty: 2, note: "", mods: ["Rocks"], seat: 1 }, { name: "Stella Artois", qty: 1, note: "", mods: [], seat: 1 }], done: false, kind: "Bar", by: "Alex" },
   ];
@@ -1094,21 +1100,44 @@ function printClosed(cl) {
 // ============================================================
 function readyList() { return S.kitchen.filter((k) => k.done && k.readyAt && !k.pickedUp).sort((a, b) => a.readyAt - b.readyAt); }
 function updateKcount() { const r = readyList().length; const rc = $("#rcount"); rc.textContent = r || ""; rc.classList.toggle("go", r > 0); $("#kcount").textContent = S.kitchen.filter((k) => !k.done && k.kind === "Kitchen").length || ""; $("#bcount").textContent = S.kitchen.filter((k) => !k.done && k.kind === "Bar").length || ""; }
+const hist = { Kitchen: false, Bar: false };
 function drawKitchen() { drawTickets("Kitchen", $("#kds"), 8, 12); }
 function drawBar() { drawTickets("Bar", $("#bds"), 5, 8); }
+function ticketPrint(k) { return () => printHTML(receiptHead(k.kind + " ticket - " + k.seat, timeOf(k.at)) + k.items.map((i) => "<div><b>" + i.qty + " " + esc(i.name) + "</b>" + (i.seat > 1 ? " (seat " + i.seat + ")" : "") + (i.mods && i.mods.length || i.note ? "<br>&nbsp;&nbsp;" + esc([...(i.mods || []), i.note].filter(Boolean).join(", ")) : "") + "</div>").join("")); }
 function drawTickets(kind, K, warnAt, oldAt) {
+  const isBar = kind === "Bar"; const showHist = hist[kind];
+  $(isBar ? "#bhist" : "#khist").classList.toggle("on", showHist); $(isBar ? "#bhist" : "#khist").textContent = showHist ? "Back to the line" : "History";
+  $(isBar ? "#bsearchwrap" : "#ksearchwrap").hidden = !showHist;
   K.innerHTML = "";
+  if (showHist) {
+    const qq = $(isBar ? "#bsearch" : "#ksearch").value.trim().toLowerCase();
+    const done = S.kitchen.filter((k) => k.done && k.kind === kind && (!qq || k.seat.toLowerCase().includes(qq) || k.items.some((i) => i.name.toLowerCase().includes(qq)))).sort((a, b) => (b.readyAt || b.at) - (a.readyAt || a.at)).slice(0, 60);
+    if (!done.length) K.innerHTML = "<div class='empty' style='grid-column:1/-1'>" + (qq ? "No past ticket matches that." : "No finished tickets yet.") + "</div>";
+    for (const k of done) {
+      const d = document.createElement("div"); d.className = "kt done";
+      d.innerHTML = "<div class='h'><span>" + esc(k.seat) + " <small>" + esc(k.by || "") + "</small></span><span class='tm mono'>" + timeOf(k.at) + "</span></div><ul>" +
+        k.items.map((i) => "<li><b>" + i.qty + "</b><span>" + esc(i.name) + (i.seat > 1 ? " <small>seat " + i.seat + "</small>" : "") + "</span>" + (i.mods && i.mods.length || i.note ? "<small>" + esc([...(i.mods || []), i.note].filter(Boolean).join(", ")) + "</small>" : "") + "</li>").join("") + "</ul>" +
+        "<div class='when'>Sent " + dateOf(k.at) + " " + timeOf(k.at) + (k.readyAt ? " - " + (isBar ? "made" : "ready") + " " + timeOf(k.readyAt) + " (" + Math.max(0, Math.round((k.readyAt - k.at) / 60000)) + " min)" : "") + (k.pickedUp ? " - picked up" : k.readyAt ? " - waiting to be picked up" : "") + "</div><div class='acts'></div>";
+      const pr = document.createElement("button"); pr.className = "btn quiet"; pr.textContent = "Print"; pr.onclick = ticketPrint(k);
+      const back = document.createElement("button"); back.className = "btn"; back.textContent = "Put back on the line"; back.onclick = () => { k.done = false; k.readyAt = null; k.pickedUp = false; save(); updateKcount(); drawTickets(kind, K, warnAt, oldAt); toast(k.seat + " is back on the line"); };
+      d.querySelector(".acts").append(pr, back); K.appendChild(d);
+    }
+    return;
+  }
   const openT = S.kitchen.filter((k) => !k.done && k.kind === kind).sort((a, b) => a.at - b.at);
-  if (!openT.length) K.innerHTML = "<div class='empty' style='grid-column:1/-1'>" + (kind === "Bar" ? "No drinks waiting. Send a round from a check and it shows up here." : "Nothing waiting. Send an order from a check and it shows up here.") + "</div>";
+  if (!openT.length) K.innerHTML = "<div class='empty' style='grid-column:1/-1'>" + (isBar ? "No drinks waiting. Send a round from a check and it shows up here." : "Nothing waiting. Send an order from a check and it shows up here.") + "</div>";
   for (const k of openT) {
     const m = mins(k.at); const d = document.createElement("div"); d.className = "kt" + (m >= oldAt ? " old" : m >= warnAt ? " warn" : "");
     d.innerHTML = "<div class='h'><span>" + esc(k.seat) + " <small>" + esc(k.by || "") + "</small></span><span class='tm mono'>" + m + " min</span></div><ul>" +
       k.items.map((i) => "<li><b>" + i.qty + "</b><span>" + esc(i.name) + (i.seat > 1 ? " <small>seat " + i.seat + "</small>" : "") + "</span>" + (i.mods && i.mods.length || i.note ? "<small>" + esc([...(i.mods || []), i.note].filter(Boolean).join(", ")) + "</small>" : "") + "</li>").join("") + "</ul><div class='acts'></div>";
-    const pr = document.createElement("button"); pr.className = "btn quiet"; pr.textContent = "Print"; pr.onclick = () => printHTML(receiptHead(k.kind + " ticket - " + k.seat, timeOf(k.at)) + k.items.map((i) => "<div><b>" + i.qty + " " + esc(i.name) + "</b>" + (i.seat > 1 ? " (seat " + i.seat + ")" : "") + (i.mods && i.mods.length || i.note ? "<br>&nbsp;&nbsp;" + esc([...(i.mods || []), i.note].filter(Boolean).join(", ")) : "") + "</div>").join(""));
-    const b = document.createElement("button"); b.className = "btn good"; b.textContent = kind === "Bar" ? "Made" : "Ready"; b.onclick = () => { k.done = true; k.readyAt = Date.now(); k.pickedUp = false; save(); updateKcount(); drawTickets(kind, K, warnAt, oldAt); toast(k.seat + (kind === "Bar" ? " drinks are up - " : " is up - ") + (k.by ? k.by + " has been told" : "server has been told")); };
+    const pr = document.createElement("button"); pr.className = "btn quiet"; pr.textContent = "Print"; pr.onclick = ticketPrint(k);
+    const b = document.createElement("button"); b.className = "btn good"; b.textContent = isBar ? "Made" : "Ready"; b.onclick = () => { k.done = true; k.readyAt = Date.now(); k.pickedUp = false; save(); updateKcount(); drawTickets(kind, K, warnAt, oldAt); toast(k.seat + (isBar ? " drinks are up - " : " is up - ") + (k.by ? k.by + " has been told" : "server has been told")); };
     d.querySelector(".acts").append(pr, b); K.appendChild(d);
   }
 }
+$("#khist").onclick = () => { hist.Kitchen = !hist.Kitchen; drawKitchen(); };
+$("#bhist").onclick = () => { hist.Bar = !hist.Bar; drawBar(); };
+$("#ksearch").oninput = drawKitchen; $("#bsearch").oninput = drawBar;
 
 // ============================================================
 //  GUESTS
