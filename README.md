@@ -20,6 +20,7 @@ Managers can change these under Settings.
 - **Void** always asks why and lands in the Voids report. Voiding something already sent needs a manager PIN.
 - **Kitchen** - food tickets in order, amber after 8 minutes and red after 12, Ready and Print.
 - **Bar** - drink tickets only, amber after 5 minutes and red after 8, Made and Print.
+- **Ready alerts** - when the kitchen taps Ready or the bar taps Made, the server sees a green "Food is up" or "Drinks up" bar at the top of Order, the table lights up green, and the Order tab gets a blinking count. Tap Picked up to clear it.
 - **Guests** - regulars, birthdays this week, who has not been in for 30 days, house account tabs and statements. Tap a phone number to text. A QR code lets guests add themselves.
 - **Reports** - today, by server, by hour, by day of week, tips owed at close, closed checks with reprint, voids.
 - **Settings** (managers) - menu items with photos and choices, categories, staff and PINs, big-finger mode, light or dark look, tax rate, tip buttons, reset to sample data.

@@ -91,6 +91,18 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
   h2{font-size:19px}
 }
 
+/* ---- "your food is up" strip: shows the server which tables to run ---- */
+.ready{display:grid;gap:8px;margin:0 0 12px}
+.ready:empty{display:none}
+.rdy{display:flex;align-items:center;gap:14px;background:var(--green-soft);box-shadow:inset 0 0 0 1px var(--green);border-radius:12px;padding:10px 14px}
+.rdy b{font-size:15px;font-weight:800;color:var(--green)}
+.rdy .sub{flex:1;color:var(--ink2)}
+.rdy .btn{background:var(--green);color:#07130D;min-height:40px;padding:8px 14px}
+.tchip.ready{background:linear-gradient(180deg,rgba(61,214,140,.18),rgba(61,214,140,.06));box-shadow:inset 0 0 0 1px var(--green)}
+.tchip.ready small{color:var(--green);font-weight:800}
+@keyframes blink{50%{opacity:.35}}
+.rail button .n.go{background:var(--green);color:#07130D;animation:blink 1.2s infinite}
+
 /* ---- tables strip across the top of Order ---- */
 .tstrip{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin:0 0 10px;scrollbar-width:thin}
 .tchip{flex:0 0 auto;border:0;background:var(--panel);box-shadow:inset 0 0 0 1px var(--line);border-radius:12px;padding:10px 14px;text-align:left;display:grid;gap:2px;min-width:104px}
@@ -330,7 +342,7 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 <div class="shell" id="shell">
   <nav class="rail" id="tabs" aria-label="Sections">
     <div class="logo">L&amp;J</div>
-    <button data-v="order" class="on"><i>OR</i>Order</button>
+    <button data-v="order" class="on"><i>OR</i>Order<span class="n" id="rcount"></span></button>
     <button data-v="kitchen"><i>KT</i>Kitchen<span class="n" id="kcount"></span></button>
     <button data-v="bar"><i>BR</i>Bar<span class="n" id="bcount"></span></button>
     <button data-v="guests"><i>GU</i>Guests</button>
@@ -345,6 +357,7 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
   <main class="page">
     <!-- ORDER: tables, menu and the check on one screen -->
     <section class="view on" id="v-order">
+      <div class="ready" id="ready"></div>
       <div class="tstrip" id="tstrip"></div>
       <div class="order">
         <div class="menuwrap">
@@ -796,16 +809,25 @@ function art(it) {
 //  ORDER SCREEN
 // ============================================================
 let cur = null, cat = null, curSeat = 1, q = "";
-function drawOrder() { drawStrip(); drawMenu(); drawTicket(); }
+function drawOrder() { drawReady(); drawStrip(); drawMenu(); drawTicket(); }
+function drawReady() {
+  const el = $("#ready"); const list = readyList(); el.innerHTML = "";
+  for (const k of list) {
+    const d = document.createElement("div"); d.className = "rdy";
+    d.innerHTML = "<b>" + esc(k.seat) + "</b><span class='sub'>" + (k.kind === "Bar" ? "Drinks are up at the bar" : "Food is up in the kitchen") + " - " + k.items.map((i) => i.qty + " " + esc(i.name)).join(", ") + " - " + mins(k.readyAt) + " min ago" + (k.by ? " - sent by " + esc(k.by) : "") + "</span>";
+    const b = document.createElement("button"); b.className = "btn"; b.textContent = "Picked up"; b.onclick = () => { k.pickedUp = true; save(); updateKcount(); drawReady(); drawStrip(); toast(k.seat + " picked up"); };
+    d.appendChild(b); el.appendChild(d);
+  }
+}
 function checkState(c) { return c.lines.some((l) => l.sent) ? "sent" : "open"; }
 function drawStrip() {
   const el = $("#tstrip"); el.innerHTML = "";
   const openN = Object.keys(S.checks).length;
   const list = document.createElement("button"); list.className = "tchip list"; list.innerHTML = "<b>Open checks</b><small>" + openN + " on the floor</small>"; list.onclick = drawOpenSheet; el.appendChild(list);
   for (const s of S.seats) {
-    const c = S.checks[s.id]; const b = document.createElement("button");
-    b.className = "tchip" + (c ? " open " + checkState(c) : "") + (s.id === cur ? " on" : "");
-    b.innerHTML = "<b>" + esc(s.label) + "</b><small>" + (c ? money(sums(c.lines).total) + " &middot; " + mins(c.opened) + " min" : esc(s.who || "free")) + "</small>";
+    const c = S.checks[s.id]; const b = document.createElement("button"); const up = readyList().filter((k) => k.seat === s.label);
+    b.className = "tchip" + (c ? " open " + checkState(c) : "") + (up.length ? " ready" : "") + (s.id === cur ? " on" : "");
+    b.innerHTML = "<b>" + esc(s.label) + "</b><small>" + (up.length ? (up.some((k) => k.kind === "Bar") && up.some((k) => k.kind !== "Bar") ? "FOOD AND DRINKS UP" : up[0].kind === "Bar" ? "DRINKS UP" : "FOOD IS UP") : c ? money(sums(c.lines).total) + " &middot; " + mins(c.opened) + " min" : esc(s.who || "free")) + "</small>";
     b.onclick = () => openSeat(s.id); el.appendChild(b);
   }
   const add = document.createElement("button"); add.className = "tchip add"; add.textContent = "+ Table";
@@ -1070,7 +1092,8 @@ function printClosed(cl) {
 // ============================================================
 //  KITCHEN AND BAR
 // ============================================================
-function updateKcount() { $("#kcount").textContent = S.kitchen.filter((k) => !k.done && k.kind === "Kitchen").length || ""; $("#bcount").textContent = S.kitchen.filter((k) => !k.done && k.kind === "Bar").length || ""; }
+function readyList() { return S.kitchen.filter((k) => k.done && k.readyAt && !k.pickedUp).sort((a, b) => a.readyAt - b.readyAt); }
+function updateKcount() { const r = readyList().length; const rc = $("#rcount"); rc.textContent = r || ""; rc.classList.toggle("go", r > 0); $("#kcount").textContent = S.kitchen.filter((k) => !k.done && k.kind === "Kitchen").length || ""; $("#bcount").textContent = S.kitchen.filter((k) => !k.done && k.kind === "Bar").length || ""; }
 function drawKitchen() { drawTickets("Kitchen", $("#kds"), 8, 12); }
 function drawBar() { drawTickets("Bar", $("#bds"), 5, 8); }
 function drawTickets(kind, K, warnAt, oldAt) {
@@ -1082,7 +1105,7 @@ function drawTickets(kind, K, warnAt, oldAt) {
     d.innerHTML = "<div class='h'><span>" + esc(k.seat) + " <small>" + esc(k.by || "") + "</small></span><span class='tm mono'>" + m + " min</span></div><ul>" +
       k.items.map((i) => "<li><b>" + i.qty + "</b><span>" + esc(i.name) + (i.seat > 1 ? " <small>seat " + i.seat + "</small>" : "") + "</span>" + (i.mods && i.mods.length || i.note ? "<small>" + esc([...(i.mods || []), i.note].filter(Boolean).join(", ")) + "</small>" : "") + "</li>").join("") + "</ul><div class='acts'></div>";
     const pr = document.createElement("button"); pr.className = "btn quiet"; pr.textContent = "Print"; pr.onclick = () => printHTML(receiptHead(k.kind + " ticket - " + k.seat, timeOf(k.at)) + k.items.map((i) => "<div><b>" + i.qty + " " + esc(i.name) + "</b>" + (i.seat > 1 ? " (seat " + i.seat + ")" : "") + (i.mods && i.mods.length || i.note ? "<br>&nbsp;&nbsp;" + esc([...(i.mods || []), i.note].filter(Boolean).join(", ")) : "") + "</div>").join(""));
-    const b = document.createElement("button"); b.className = "btn good"; b.textContent = kind === "Bar" ? "Made" : "Ready"; b.onclick = () => { k.done = true; save(); updateKcount(); drawTickets(kind, K, warnAt, oldAt); toast(k.seat + (kind === "Bar" ? " drinks are up" : " is up")); };
+    const b = document.createElement("button"); b.className = "btn good"; b.textContent = kind === "Bar" ? "Made" : "Ready"; b.onclick = () => { k.done = true; k.readyAt = Date.now(); k.pickedUp = false; save(); updateKcount(); drawTickets(kind, K, warnAt, oldAt); toast(k.seat + (kind === "Bar" ? " drinks are up - " : " is up - ") + (k.by ? k.by + " has been told" : "server has been told")); };
     d.querySelector(".acts").append(pr, b); K.appendChild(d);
   }
 }
@@ -1269,7 +1292,7 @@ try { applyLook(localStorage.getItem("lj-look") === "light" ? "light" : "dark");
 applyBig(); drawLockHint(); updateKcount(); tickClock();
 if (location.hash === "#join") showJoin();
 else { let saved = null; try { saved = S.staff.find((s) => s.id === sessionStorage.getItem("lj-me")); } catch (e) {} setMe(saved || null); show("order"); }
-setInterval(() => { tickClock(); if ($("#v-order").classList.contains("on")) { drawStrip(); } if ($("#v-kitchen").classList.contains("on")) drawKitchen(); if ($("#v-bar").classList.contains("on")) drawBar(); }, 30000);
+setInterval(() => { tickClock(); if ($("#v-order").classList.contains("on")) { drawStrip(); drawReady(); } if ($("#v-kitchen").classList.contains("on")) drawKitchen(); if ($("#v-bar").classList.contains("on")) drawBar(); }, 30000);
 window.addEventListener("hashchange", () => { if (location.hash === "#join") showJoin(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") { $$(".sheet.on").forEach((s) => s.classList.remove("on")); $("#flip").classList.remove("on"); } });
 </script>
