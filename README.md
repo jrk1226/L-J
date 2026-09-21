@@ -1,28 +1,29 @@
-# L&J - test point of sale and CRM
+# L&J Point of Sale (test build)
 
-A one-page test of a restaurant and bar point of sale with a small guest book (the CRM side).
+A test point-of-sale and guest list for restaurants and bars. One file, no database yet: everything is remembered in the browser on the device it runs on.
 
-Open `index.html` in any browser. Everything runs in the page with sample data: nothing is saved when the page closes and no real card is charged.
+Open it: https://jrk1226.github.io/L-J/
 
-What is in it:
+## Test PINs
 
-- Floor: tables and bar seats, open checks in amber
-- Order: menu by category, check with quantities and kitchen notes, tax at 8.875%
-- Send to kitchen: food goes to a kitchen ticket, drinks to a bar ticket
-- Pay: tip presets, card / cash / house account, split the check evenly
-- Guests: regulars, phone, visits, spend, what they usually order, notes
-- End of day: checks closed, sales, tips, tax, cards vs cash, top sellers
+- Josh 1234 (manager)
+- Sam 1111
+- Alex 2222
 
-Next steps when it is worth building for real: a database so checks and guests are kept, logins for staff, a card reader, and a printer for kitchen tickets.
+Managers can change these under Settings.
 
-## Pictures on the menu tiles
+## What is in it
 
-Drop a photo into the `images` folder with one of these names and the tile picks it up on its own (until then the tile draws a pint of the right colour):
+- **Order** - tables across the top, menu in the middle, the check on the right. Search box, a Quick row of what gets rung up most, seats on a check, choices (Hot, Medium rare, No onions) and kitchen notes on every line. Hold a tile to add more than one or to 86 it for the night. Undo on the last thing you did.
+- **Send** splits food to the kitchen and drinks to the bar. **Print check** prints an 80mm slip with tip lines.
+- **Pay** - whole check, one seat, or split evenly. Tip buttons, "Flip to guest" so they pick the tip on the screen, cash with change back, a pretend card reader, house accounts. Receipt with a QR code to join the guest list.
+- **Void** always asks why and lands in the Voids report. Voiding something already sent needs a manager PIN.
+- **Kitchen** - tickets in order, amber after 8 minutes and red after 12, Ready and Print.
+- **Guests** - regulars, birthdays this week, who has not been in for 30 days, house account tabs and statements. Tap a phone number to text. A QR code lets guests add themselves.
+- **Reports** - today, by server, by hour, by day of week, tips owed at close, closed checks with reprint, voids.
+- **Settings** (managers) - menu items with photos and choices, categories, staff and PINs, big-finger mode, light or dark look, tax rate, tip buttons, reset to sample data.
 
-- `images/bud-light.png` (in place)
-- `images/blue-point-toasted-lager.png` (in place)
-- `images/montauk-wave-chaser.png` (in place)
-- `images/guinness.png` (in place)
-- `images/stella-artois.png` (in place)
+## Files
 
-Any square-ish photo works; it is cropped to fit. Use photos you have the rights to - your distributor's product sheets are the usual source.
+- `index.html` - the whole app
+- `images/` - draft beer pictures
