@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>L&amp;J Point of Sale</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --ink:#131A22; --ink2:#2B3644; --muted:#6B7684; --line:#CBD3DC; --line2:#E1E6EC;
+  --bg:#EEF1F4; --card:#FFFFFF; --sunk:#F5F7F9; --accent:#B45309; --accent-soft:#FBEFE3; --accent-ink:#7C3A06;
+  --good:#0E7A4A; --good-soft:#E6F5EC; --bad:#B42318; --bad-soft:#FBEAE8; --warn:#8A5A00; --warn-soft:#FFF4D6;
+  --dark:#1B232C; --dark-ink:#F3F5F7;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --ink:#F1F4F7; --ink2:#C9D1DA; --muted:#8B96A3; --line:#3B4654; --line2:#2C3541;
+  --bg:#12171D; --card:#1B222B; --sunk:#222B35; --accent:#E8A05A; --accent-soft:#3A2A18; --accent-ink:#F2C08E;
+  --good:#5BC98F; --good-soft:#153123; --bad:#F08A80; --bad-soft:#3B1F1C; --warn:#E5B85C; --warn-soft:#3A2F12;
+  --dark:#0D1115; --dark-ink:#F3F5F7;
+}}
+:root[data-theme="dark"]{
+  --ink:#F1F4F7; --ink2:#C9D1DA; --muted:#8B96A3; --line:#3B4654; --line2:#2C3541;
+  --bg:#12171D; --card:#1B222B; --sunk:#222B35; --accent:#E8A05A; --accent-soft:#3A2A18; --accent-ink:#F2C08E;
+  --good:#5BC98F; --good-soft:#153123; --bad:#F08A80; --bad-soft:#3B1F1C; --warn:#E5B85C; --warn-soft:#3A2F12;
+  --dark:#0D1115; --dark-ink:#F3F5F7;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.4}
+.mono{font-family:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* frame */
+.app{display:flex;flex-direction:column;min-height:100%}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--dark);color:var(--dark-ink);display:flex;align-items:center;gap:10px;padding:8px 16px;flex-wrap:wrap}
+.top .brand{font-weight:700;letter-spacing:.02em;font-size:15px}
+.top .brand small{font-weight:400;opacity:.7;margin-left:8px;font-size:12px}
+.tabs{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.tabs button{background:transparent;color:var(--dark-ink);border:1px solid transparent;border-radius:6px;padding:6px 12px;font-weight:500;opacity:.8}
+.tabs button.on{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25);opacity:1;font-weight:600}
+.tabs button .n{display:inline-block;min-width:18px;padding:0 5px;margin-left:6px;border-radius:999px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;text-align:center}
+.main{flex:1;padding:16px;padding-inline:16px;max-width:1240px;width:100%;margin:0 auto}
+.view{display:none}.view.on{display:block}
+h2{font-size:17px;font-weight:700;margin:0 0 10px}
+.sub{color:var(--muted);font-size:12.5px}
+.banner{background:var(--warn-soft);color:var(--warn);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:12.5px;margin:0 0 14px}
+
+/* floor */
+.floor{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.seat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:left;min-height:104px;display:flex;flex-direction:column;gap:4px;position:relative}
+.seat b{font-size:15px}
+.seat .who{color:var(--muted);font-size:12px}
+.seat .amt{margin-top:auto;font-weight:600}
+.seat.open{border-color:var(--accent);background:var(--accent-soft)}
+.seat.open::after{content:"OPEN";position:absolute;top:10px;right:10px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--accent-ink)}
+.seat.fired::after{content:"SENT"}
+.seat.new{border-style:dashed;justify-content:center;align-items:center;color:var(--muted);font-weight:600}
+
+/* order screen */
+.order{display:grid;grid-template-columns:1fr 360px;gap:14px}
+@media (max-width:820px){.order{grid-template-columns:1fr}}
+.cats{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.cats button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 12px;font-weight:500;color:var(--ink2)}
+.cats button.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.item{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:left;display:flex;flex-direction:column;gap:2px;min-height:72px}
+.item:active{transform:scale(.98)}
+.item b{font-size:13.5px}
+.item .p{color:var(--muted);font-size:12.5px;margin-top:auto}
+.item.eighty{opacity:.45}
+.ticket{background:var(--card);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;overflow:hidden;position:sticky;top:64px;max-height:calc(100vh - 90px)}
+.thead{padding:10px 12px;border-bottom:1px solid var(--line2);background:var(--sunk);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.thead b{font-size:15px}
+.thead select{margin-left:auto;border:1px solid var(--line);border-radius:6px;padding:4px 6px;background:var(--card);color:var(--ink);font-size:12.5px;max-width:170px}
+.lines{flex:1;overflow:auto;padding:4px 0}
+.line{display:grid;grid-template-columns:1fr auto auto;gap:6px 10px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--line2)}
+.line .nm{font-weight:600}
+.line .note{grid-column:1/-1;color:var(--muted);font-size:12px;margin-top:-4px}
+.line .note input{border:0;border-bottom:1px dashed var(--line);background:transparent;color:var(--ink2);width:100%;padding:1px 0;font-size:12px}
+.line.sent .nm::after{content:" · sent";color:var(--good);font-weight:500;font-size:11.5px}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.qty button{border:0;background:var(--sunk);width:26px;height:26px;color:var(--ink)}
+.qty span{min-width:24px;text-align:center;font-weight:600}
+.empty{padding:30px 12px;text-align:center;color:var(--muted)}
+.totals{border-top:1px solid var(--line2);padding:10px 12px;display:grid;gap:4px;font-size:13px}
+.totals div{display:flex;justify-content:space-between}
+.totals .grand{font-size:17px;font-weight:700;margin-top:4px}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px 12px;border-top:1px solid var(--line2);background:var(--sunk)}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:7px;padding:9px 10px;font-weight:600}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.good{background:var(--good);border-color:var(--good);color:#fff}
+.btn.quiet{background:transparent;color:var(--muted);font-weight:500}
+.btn.wide{grid-column:1/-1}
+.btn:disabled{opacity:.45;cursor:default}
+
+/* pay sheet */
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:30;padding:0 0 env(safe-area-inset-bottom,0px)}
+.sheet.on{display:flex}
+.card{background:var(--card);color:var(--ink);border-radius:14px 14px 0 0;width:min(560px,100%);padding:16px;max-height:92vh;overflow:auto}
+@media (min-width:640px){.sheet{align-items:center}.card{border-radius:14px}}
+.card h3{margin:0 0 8px;font-size:17px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.row .btn{flex:1 1 90px}
+.row .btn.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.big{font-size:28px;font-weight:700;margin:6px 0 2px}
+.field{display:grid;gap:4px;margin:8px 0}
+.field label{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.field input,.field select,.field textarea{border:1px solid var(--line);border-radius:7px;padding:9px 10px;background:var(--card);color:var(--ink);width:100%}
+.split{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin:6px 0}
+.split div{border:1px solid var(--line2);border-radius:7px;padding:8px;text-align:center}
+.split b{display:block;font-size:15px}
+.split small{color:var(--muted)}
+
+/* kitchen */
+.kds{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.kt{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:10px;padding:10px 12px}
+.kt.old{border-top-color:var(--bad)}
+.kt .h{display:flex;justify-content:space-between;font-weight:700;margin-bottom:6px}
+.kt .h small{font-weight:500;color:var(--muted)}
+.kt ul{margin:0;padding:0;list-style:none;display:grid;gap:3px}
+.kt li b{display:inline-block;min-width:22px}
+.kt li small{display:block;color:var(--muted);padding-left:22px}
+.kt .btn{width:100%;margin-top:10px}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13px}
+.tblwrap{overflow-x:auto;border-radius:10px}
+.tbl th{text-align:left;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:9px 12px;background:var(--sunk);border-bottom:1px solid var(--line)}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--line2);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td.r,.tbl th.r{text-align:right}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--sunk);border:1px solid var(--line);color:var(--ink2)}
+.pill.good{background:var(--good-soft);color:var(--good);border-color:transparent}
+.pill.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:0 0 14px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.tile .n{font-size:24px;font-weight:700;line-height:1.1}
+.tile .l{color:var(--muted);font-size:12px;margin-top:2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 10px}
+.toolbar input{border:1px solid var(--line);border-radius:7px;padding:8px 10px;background:var(--card);color:var(--ink);flex:1 1 200px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--card);padding:9px 14px;border-radius:8px;font-weight:600;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}.item:active{transform:none}}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand">L&amp;J <small>test point of sale</small></div>
+    <div class="tabs" id="tabs">
+      <button data-v="floor" class="on">Floor</button>
+      <button data-v="order">Order</button>
+      <button data-v="kitchen">Kitchen <span class="n" id="kcount">0</span></button>
+      <button data-v="guests">Guests</button>
+      <button data-v="eod">End of day</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="banner">Test system with sample data. Nothing here is saved when the page is closed, and no real card is charged.</div>
+
+    <!-- FLOOR -->
+    <section class="view on" id="v-floor">
+      <h2>Floor</h2>
+      <p class="sub" style="margin:0 0 10px">Tap a table or bar seat to open its check. Amber means a check is open.</p>
+      <div class="floor" id="floor"></div>
+    </section>
+
+    <!-- ORDER -->
+    <section class="view" id="v-order">
+      <div class="order">
+        <div>
+          <div class="cats" id="cats"></div>
+          <div class="menu" id="menu"></div>
+        </div>
+        <div class="ticket">
+          <div class="thead">
+            <b id="tname">No check open</b>
+            <select id="guestpick" title="Attach a guest to this check"><option value="">Guest: walk-in</option></select>
+          </div>
+          <div class="lines" id="lines"><div class="empty">Pick a table on the Floor, then tap items to add them.</div></div>
+          <div class="totals" id="totals"></div>
+          <div class="acts">
+            <button class="btn" id="btnSend">Send to kitchen</button>
+            <button class="btn" id="btnSplit">Split</button>
+            <button class="btn quiet" id="btnVoid">Void check</button>
+            <button class="btn primary" id="btnPay">Pay</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- KITCHEN -->
+    <section class="view" id="v-kitchen">
+      <h2>Kitchen and bar tickets</h2>
+      <p class="sub" style="margin:0 0 10px">Every "Send to kitchen" lands here. Red means it has been waiting more than 12 minutes.</p>
+      <div class="kds" id="kds"></div>
+    </section>
+
+    <!-- GUESTS -->
+    <section class="view" id="v-guests">
+      <h2>Guests</h2>
+      <p class="sub" style="margin:0 0 10px">The CRM side. Regulars, what they drink, when they were last in. Attach a guest to a check and their visit and spend update on their own.</p>
+      <div class="toolbar">
+        <input id="gq" placeholder="Find a guest by name or phone" aria-label="Find a guest">
+        <button class="btn" id="btnNewGuest">New guest</button>
+      </div>
+      <div class="tblwrap"><table class="tbl" id="gtable">
+        <thead><tr><th>Guest</th><th>Phone</th><th class="r">Visits</th><th class="r">Spent</th><th>Last in</th><th>Usually</th><th>Notes</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </section>
+
+    <!-- END OF DAY -->
+    <section class="view" id="v-eod">
+      <h2>End of day</h2>
+      <div class="tiles" id="eodtiles"></div>
+      <div class="two">
+        <div>
+          <h2 style="font-size:15px">Closed checks</h2>
+          <div class="tblwrap"><table class="tbl" id="closed">
+            <thead><tr><th>Check</th><th>Guest</th><th class="r">Sale</th><th class="r">Tip</th><th>Paid by</th><th>Closed</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+        </div>
+        <div>
+          <h2 style="font-size:15px">Top sellers today</h2>
+          <div class="tblwrap"><table class="tbl" id="topsell">
+            <thead><tr><th>Item</th><th class="r">Sold</th><th class="r">Sales</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- PAY SHEET -->
+<div class="sheet" id="paysheet" role="dialog" aria-modal="true" aria-labelledby="payh">
+  <div class="card">
+    <h3 id="payh">Take payment</h3>
+    <div class="sub" id="paywho"></div>
+    <div class="big mono" id="paytotal">$0.00</div>
+    <div class="sub">includes 8.875% sales tax</div>
+    <div class="field"><label>Tip</label>
+      <div class="row" id="tips">
+        <button class="btn" data-t="0.18">18%</button>
+        <button class="btn on" data-t="0.20">20%</button>
+        <button class="btn" data-t="0.22">22%</button>
+        <button class="btn" data-t="0">No tip</button>
+      </div>
+    </div>
+    <div class="field"><label>Paid by</label>
+      <div class="row" id="methods">
+        <button class="btn on" data-m="Card">Card</button>
+        <button class="btn" data-m="Cash">Cash</button>
+        <button class="btn" data-m="House account">House account</button>
+      </div>
+    </div>
+    <div class="totals" style="border:0;padding:4px 0" id="paybreak"></div>
+    <div class="row">
+      <button class="btn quiet" id="payCancel">Back</button>
+      <button class="btn good" id="payDone">Close check</button>
+    </div>
+  </div>
+</div>
+
+<!-- SPLIT SHEET -->
+<div class="sheet" id="splitsheet" role="dialog" aria-modal="true" aria-labelledby="splith">
+  <div class="card">
+    <h3 id="splith">Split the check</h3>
+    <div class="sub">Even split, tax included. Each share pays its own tip.</div>
+    <div class="row" id="splitn">
+      <button class="btn" data-n="2">2 ways</button>
+      <button class="btn on" data-n="3">3 ways</button>
+      <button class="btn" data-n="4">4 ways</button>
+      <button class="btn" data-n="6">6 ways</button>
+    </div>
+    <div class="split" id="splitout"></div>
+    <div class="row"><button class="btn quiet" id="splitClose">Back</button></div>
+  </div>
+</div>
+
+<!-- NEW GUEST / NEW SEAT SHEET -->
+<div class="sheet" id="guestsheet" role="dialog" aria-modal="true" aria-labelledby="guesth">
+  <div class="card">
+    <h3 id="guesth">New guest</h3>
+    <div class="field"><label>Name</label><input id="gname" placeholder="First and last"></div>
+    <div class="field"><label>Phone</label><input id="gphone" placeholder="(516) 555-0100" inputmode="tel"></div>
+    <div class="field"><label>Usually orders</label><input id="gusual" placeholder="Old Fashioned, wings"></div>
+    <div class="field"><label>Notes</label><textarea id="gnotes" rows="2" placeholder="Birthday in March, likes the corner booth"></textarea></div>
+    <div class="row"><button class="btn quiet" id="guestCancel">Back</button><button class="btn primary" id="guestSave">Save guest</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- sample data ----------
+const TAX = 0.08875; // NY State + Nassau/NYC combined sales tax on restaurant meals
+const MENU = {
+  "Drafts": [["Bud Light", 6], ["Blue Point Toasted Lager", 8], ["Montauk Wave Chaser IPA", 8], ["Guinness", 8], ["Stella Artois", 8]],
+  "Cocktails": [["Old Fashioned", 14], ["Margarita", 13], ["Espresso Martini", 15], ["Moscow Mule", 13], ["Aperol Spritz", 13], ["Well drink", 9]],
+  "Wine": [["House red", 11], ["House white", 11], ["Pinot Grigio", 13], ["Cabernet", 14], ["Prosecco", 12]],
+  "Non-alcoholic": [["Soda", 3], ["Iced tea", 3.5], ["Coffee", 3], ["Sparkling water", 4]],
+  "Starters": [["Wings (10)", 16], ["Mozzarella sticks", 12], ["Nachos", 15], ["Calamari", 17], ["Caesar salad", 13]],
+  "Mains": [["Smash burger", 18], ["Chicken sandwich", 17], ["Fish and chips", 22], ["Steak frites", 34], ["Penne vodka", 19], ["Margherita pie", 20]],
+  "Desserts": [["Brownie sundae", 10], ["Cheesecake", 9], ["Cannoli (2)", 8]],
+};
+const KITCHEN_CATS = new Set(["Starters", "Mains", "Desserts"]);
+
+let guests = [
+  { id: 1, name: "Mike Russo", phone: "(516) 555-0142", visits: 23, spent: 1420.50, last: "2026-09-13", usual: "Blue Point, wings", notes: "Sits at the bar, Jets on Sundays" },
+  { id: 2, name: "Dana Whitfield", phone: "(917) 555-0188", visits: 9, spent: 611.00, last: "2026-09-18", usual: "Aperol Spritz, calamari", notes: "Birthday Oct 4" },
+  { id: 3, name: "The Alvarez table", phone: "(631) 555-0107", visits: 14, spent: 2210.75, last: "2026-09-06", usual: "Steak frites x2, house red", notes: "Party of 6, corner booth" },
+  { id: 4, name: "Priya Nair", phone: "(516) 555-0161", visits: 4, spent: 188.20, last: "2026-08-29", usual: "Espresso Martini", notes: "" },
+];
+let nextGuest = 5;
+
+let seats = [
+  { id: "T1", label: "Table 1", who: "4 top" }, { id: "T2", label: "Table 2", who: "2 top" }, { id: "T3", label: "Table 3", who: "4 top" },
+  { id: "T4", label: "Table 4", who: "6 top" }, { id: "T5", label: "Table 5", who: "2 top" }, { id: "T6", label: "Table 6", who: "4 top" },
+  { id: "B1", label: "Bar 1", who: "bar" }, { id: "B2", label: "Bar 2", who: "bar" }, { id: "B3", label: "Bar 3", who: "bar" }, { id: "B4", label: "Bar 4", who: "bar" },
+  { id: "TO", label: "Takeout", who: "phone / walk-up" },
+];
+let checks = {};       // seatId -> { lines:[{name,price,qty,note,sent,cat}], guestId, opened }
+let kitchen = [];      // { id, seat, at, items:[{name,qty,note}] , done }
+let closed = [];       // { seat, guest, sale, tax, tip, method, at, lines }
+let checkNo = 1041;
+let current = null;
+let cat = "Drafts";
+
+// seed: two open checks so the floor is not empty
+checks["T4"] = { lines: [{ name: "Steak frites", price: 34, qty: 2, note: "", sent: true, cat: "Mains" }, { name: "House red", price: 11, qty: 2, note: "", sent: true, cat: "Wine" }, { name: "Calamari", price: 17, qty: 1, note: "extra lemon", sent: true, cat: "Starters" }], guestId: 3, opened: Date.now() - 32 * 60000, no: checkNo++ };
+checks["B2"] = { lines: [{ name: "Blue Point Toasted Lager", price: 8, qty: 2, note: "", sent: false, cat: "Drafts" }, { name: "Wings (10)", price: 16, qty: 1, note: "hot", sent: false, cat: "Starters" }], guestId: 1, opened: Date.now() - 6 * 60000, no: checkNo++ };
+kitchen.push({ id: 1, seat: "Table 4", at: Date.now() - 31 * 60000, items: [{ name: "Calamari", qty: 1, note: "extra lemon" }, { name: "Steak frites", qty: 2, note: "" }], done: true });
+closed.push({ no: 1038, seat: "Table 2", guest: "Dana Whitfield", sale: 47.00, tax: 4.17, tip: 10.00, method: "Card", at: Date.now() - 95 * 60000, lines: [{ name: "Aperol Spritz", qty: 2, price: 13 }, { name: "Nachos", qty: 1, price: 15 }, { name: "Soda", qty: 2, price: 3 }] });
+closed.push({ no: 1039, seat: "Bar 1", guest: "walk-in", sale: 30.00, tax: 2.66, tip: 6.00, method: "Cash", at: Date.now() - 70 * 60000, lines: [{ name: "Guinness", qty: 3, price: 8 }, ] });
+closed.push({ no: 1040, seat: "Takeout", guest: "Priya Nair", sale: 37.00, tax: 3.28, tip: 0, method: "Card", at: Date.now() - 40 * 60000, lines: [{ name: "Margherita pie", qty: 1, price: 20 }, { name: "Chicken sandwich", qty: 1, price: 17 }] });
+
+// ---------- helpers ----------
+const $ = (s) => document.querySelector(s);
+const money = (n) => "$" + (Math.round(n * 100) / 100).toFixed(2);
+const timeOf = (t) => new Date(t).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+const mins = (t) => Math.max(0, Math.round((Date.now() - t) / 60000));
+const guestName = (id) => (guests.find((g) => g.id === id) || {}).name || "walk-in";
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), 1800); }
+function sums(chk) {
+  const sale = chk.lines.reduce((n, l) => n + l.price * l.qty, 0);
+  const tax = sale * TAX;
+  return { sale, tax, total: sale + tax };
+}
+
+// ---------- views ----------
+function show(v) {
+  document.querySelectorAll(".view").forEach((s) => s.classList.toggle("on", s.id === "v-" + v));
+  document.querySelectorAll("#tabs button").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
+  if (v === "floor") drawFloor();
+  if (v === "order") drawOrder();
+  if (v === "kitchen") drawKitchen();
+  if (v === "guests") drawGuests();
+  if (v === "eod") drawEod();
+}
+$("#tabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) show(b.dataset.v); });
+
+// floor
+function drawFloor() {
+  const f = $("#floor"); f.innerHTML = "";
+  for (const s of seats) {
+    const c = checks[s.id];
+    const b = document.createElement("button");
+    b.className = "seat" + (c ? (c.lines.some((l) => l.sent) ? " open fired" : " open") : "");
+    b.innerHTML = "<b>" + s.label + "</b><span class='who'>" + (c ? guestName(c.guestId) + " · " + mins(c.opened) + " min" : s.who) + "</span>" +
+      (c ? "<span class='amt mono'>" + money(sums(c).total) + "</span>" : "<span class='amt' style='color:var(--muted);font-weight:500'>free</span>");
+    b.onclick = () => { openSeat(s.id); };
+    f.appendChild(b);
+  }
+  const n = document.createElement("button");
+  n.className = "seat new"; n.textContent = "+ Add a table or seat";
+  n.onclick = () => { const label = prompt("Name the table or seat (for example Table 7 or Patio 1):"); if (!label) return; const id = "X" + Date.now(); seats.push({ id, label: label.trim(), who: "" }); drawFloor(); };
+  f.appendChild(n);
+}
+function openSeat(id) {
+  if (!checks[id]) checks[id] = { lines: [], guestId: null, opened: Date.now(), no: checkNo++ };
+  current = id; show("order");
+}
+
+// order
+function drawOrder() {
+  const cats = $("#cats"); cats.innerHTML = "";
+  for (const k of Object.keys(MENU)) { const b = document.createElement("button"); b.textContent = k; b.className = k === cat ? "on" : ""; b.onclick = () => { cat = k; drawOrder(); }; cats.appendChild(b); }
+  const m = $("#menu"); m.innerHTML = "";
+  for (const [name, price] of MENU[cat]) {
+    const b = document.createElement("button"); b.className = "item";
+    b.innerHTML = "<b>" + name + "</b><span class='p mono'>" + money(price) + "</span>";
+    b.onclick = () => addLine(name, price);
+    m.appendChild(b);
+  }
+  const gp = $("#guestpick"); gp.innerHTML = "<option value=''>Guest: walk-in</option>" + guests.map((g) => "<option value='" + g.id + "'>" + g.name + "</option>").join("");
+  drawTicket();
+}
+function addLine(name, price) {
+  if (!current) { toast("Pick a table on the Floor first"); show("floor"); return; }
+  const c = checks[current];
+  const ex = c.lines.find((l) => l.name === name && !l.sent);
+  if (ex) ex.qty++; else c.lines.push({ name, price, qty: 1, note: "", sent: false, cat });
+  drawTicket();
+}
+function drawTicket() {
+  const c = current ? checks[current] : null;
+  const seat = current ? seats.find((s) => s.id === current) : null;
+  $("#tname").textContent = c ? seat.label + " · check " + c.no : "No check open";
+  $("#guestpick").value = c && c.guestId ? String(c.guestId) : "";
+  const L = $("#lines"); L.innerHTML = "";
+  if (!c) { L.innerHTML = "<div class='empty'>Pick a table on the Floor, then tap items to add them.</div>"; }
+  else if (!c.lines.length) { L.innerHTML = "<div class='empty'>Nothing on the check yet. Tap an item.</div>"; }
+  else c.lines.forEach((l, i) => {
+    const d = document.createElement("div"); d.className = "line" + (l.sent ? " sent" : "");
+    d.innerHTML = "<span class='nm'>" + l.name + "</span>" +
+      "<span class='qty'><button aria-label='one less'>-</button><span>" + l.qty + "</span><button aria-label='one more'>+</button></span>" +
+      "<span class='mono'>" + money(l.price * l.qty) + "</span>" +
+      (l.sent && !l.note ? "" : "<span class='note'><input placeholder='note for the kitchen (no onions, well done)' value=\"" + l.note.replace(/"/g, "&quot;") + "\" " + (l.sent ? "disabled" : "") + "></span>");
+    const [minus, plus] = d.querySelectorAll(".qty button");
+    minus.onclick = () => { if (l.sent) return toast("Already sent - void the check to remove it"); l.qty--; if (l.qty <= 0) c.lines.splice(i, 1); drawTicket(); };
+    plus.onclick = () => { if (l.sent) { c.lines.push({ ...l, qty: 1, sent: false }); } else l.qty++; drawTicket(); };
+    const ni = d.querySelector("input"); if (ni) ni.oninput = (e) => { l.note = e.target.value; };
+    L.appendChild(d);
+  });
+  const T = $("#totals");
+  if (c && c.lines.length) { const s = sums(c); T.innerHTML = "<div><span>Subtotal</span><span class='mono'>" + money(s.sale) + "</span></div><div><span>Tax 8.875%</span><span class='mono'>" + money(s.tax) + "</span></div><div class='grand'><span>Total</span><span class='mono'>" + money(s.total) + "</span></div>"; }
+  else T.innerHTML = "";
+  const unsent = c ? c.lines.filter((l) => !l.sent).length : 0;
+  $("#btnSend").disabled = !unsent; $("#btnSend").textContent = unsent ? "Send to kitchen (" + unsent + ")" : "Send to kitchen";
+  $("#btnPay").disabled = !(c && c.lines.length); $("#btnSplit").disabled = !(c && c.lines.length); $("#btnVoid").disabled = !c;
+}
+$("#guestpick").onchange = (e) => { if (current) { checks[current].guestId = e.target.value ? Number(e.target.value) : null; toast(e.target.value ? guestName(Number(e.target.value)) + " on the check" : "Walk-in"); } };
+$("#btnSend").onclick = () => {
+  const c = checks[current]; const seat = seats.find((s) => s.id === current);
+  const items = c.lines.filter((l) => !l.sent);
+  const food = items.filter((l) => KITCHEN_CATS.has(l.cat)); const bar = items.filter((l) => !KITCHEN_CATS.has(l.cat));
+  if (food.length) kitchen.push({ id: kitchen.length + 1, seat: seat.label, at: Date.now(), items: food.map((l) => ({ name: l.name, qty: l.qty, note: l.note })), done: false, kind: "Kitchen" });
+  if (bar.length) kitchen.push({ id: kitchen.length + 1, seat: seat.label, at: Date.now(), items: bar.map((l) => ({ name: l.name, qty: l.qty, note: l.note })), done: false, kind: "Bar" });
+  items.forEach((l) => (l.sent = true));
+  drawTicket(); updateKcount(); toast("Sent: " + items.length + (items.length === 1 ? " item" : " items"));
+};
+$("#btnVoid").onclick = () => { const seat = seats.find((s) => s.id === current); if (confirm("Void the whole check for " + seat.label + "? Nothing is charged.")) { delete checks[current]; current = null; show("floor"); toast("Check voided"); } };
+
+// pay
+let tipRate = 0.2, method = "Card";
+$("#btnPay").onclick = () => { drawPay(); $("#paysheet").classList.add("on"); };
+$("#tips").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; tipRate = Number(b.dataset.t); [...$("#tips").children].forEach((x) => x.classList.toggle("on", x === b)); drawPay(); };
+$("#methods").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; method = b.dataset.m; [...$("#methods").children].forEach((x) => x.classList.toggle("on", x === b)); drawPay(); };
+function drawPay() {
+  const c = checks[current]; const s = sums(c); const tip = s.sale * tipRate; const seat = seats.find((x) => x.id === current);
+  $("#paywho").textContent = seat.label + " · check " + c.no + " · " + guestName(c.guestId);
+  $("#paytotal").textContent = money(s.total + tip);
+  $("#paybreak").innerHTML = "<div><span>Food and drink</span><span class='mono'>" + money(s.sale) + "</span></div><div><span>Tax</span><span class='mono'>" + money(s.tax) + "</span></div><div><span>Tip (" + Math.round(tipRate * 100) + "%)</span><span class='mono'>" + money(tip) + "</span></div><div><span>Paid by</span><span>" + method + "</span></div>";
+}
+$("#payCancel").onclick = () => $("#paysheet").classList.remove("on");
+$("#payDone").onclick = () => {
+  const c = checks[current]; const s = sums(c); const tip = s.sale * tipRate; const seat = seats.find((x) => x.id === current);
+  closed.push({ no: c.no, seat: seat.label, guest: guestName(c.guestId), sale: s.sale, tax: s.tax, tip, method, at: Date.now(), lines: c.lines.map((l) => ({ name: l.name, qty: l.qty, price: l.price })) });
+  const g = guests.find((x) => x.id === c.guestId);
+  if (g) { g.visits++; g.spent += s.sale + tip; g.last = new Date().toISOString().slice(0, 10); }
+  delete checks[current]; current = null;
+  $("#paysheet").classList.remove("on"); toast("Check " + closed[closed.length - 1].no + " closed - " + money(s.total + tip) + " by " + method);
+  show("floor");
+};
+
+// split
+let splitN = 3;
+$("#btnSplit").onclick = () => { drawSplit(); $("#splitsheet").classList.add("on"); };
+$("#splitn").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; splitN = Number(b.dataset.n); [...$("#splitn").children].forEach((x) => x.classList.toggle("on", x === b)); drawSplit(); };
+function drawSplit() { const s = sums(checks[current]); const each = s.total / splitN; $("#splitout").innerHTML = Array.from({ length: splitN }, (_, i) => "<div><small>Guest " + (i + 1) + "</small><b class='mono'>" + money(each) + "</b><small>+ tip at 20%: " + money(each + s.sale / splitN * 0.2) + "</small></div>").join(""); }
+$("#splitClose").onclick = () => $("#splitsheet").classList.remove("on");
+
+// kitchen
+function updateKcount() { $("#kcount").textContent = kitchen.filter((k) => !k.done).length; }
+function drawKitchen() {
+  const K = $("#kds"); K.innerHTML = "";
+  const open = kitchen.filter((k) => !k.done).sort((a, b) => a.at - b.at);
+  if (!open.length) K.innerHTML = "<div class='empty' style='grid-column:1/-1'>Nothing waiting. Send an order from a check and it shows up here.</div>";
+  for (const k of open) {
+    const d = document.createElement("div"); d.className = "kt" + (mins(k.at) >= 12 ? " old" : "");
+    d.innerHTML = "<div class='h'><span>" + k.seat + "</span><small>" + (k.kind || "Kitchen") + " · " + mins(k.at) + " min</small></div><ul>" +
+      k.items.map((i) => "<li><b>" + i.qty + "</b>" + i.name + (i.note ? "<small>" + i.note + "</small>" : "") + "</li>").join("") + "</ul>";
+    const b = document.createElement("button"); b.className = "btn good"; b.textContent = "Done - mark ready"; b.onclick = () => { k.done = true; updateKcount(); drawKitchen(); toast(k.seat + " up"); };
+    d.appendChild(b); K.appendChild(d);
+  }
+}
+
+// guests
+function drawGuests() {
+  const q = $("#gq").value.trim().toLowerCase();
+  const rows = guests.filter((g) => !q || g.name.toLowerCase().includes(q) || g.phone.replace(/\D/g, "").includes(q.replace(/\D/g, "") || "~"));
+  $("#gtable tbody").innerHTML = rows.map((g) => {
+    const days = Math.round((Date.now() - new Date(g.last + "T12:00:00")) / 86400000);
+    const pill = days <= 14 ? "<span class='pill good'>regular</span>" : days > 45 ? "<span class='pill warn'>not seen in " + days + " days</span>" : "";
+    return "<tr><td><b>" + g.name + "</b> " + pill + "</td><td class='mono'>" + g.phone + "</td><td class='r mono'>" + g.visits + "</td><td class='r mono'>" + money(g.spent) + "</td><td>" + new Date(g.last + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) + "</td><td>" + g.usual + "</td><td class='sub'>" + (g.notes || "") + "</td></tr>";
+  }).join("") || "<tr><td colspan='7' class='empty'>No guest matches that.</td></tr>";
+}
+$("#gq").oninput = drawGuests;
+$("#btnNewGuest").onclick = () => { $("#gname").value = ""; $("#gphone").value = ""; $("#gusual").value = ""; $("#gnotes").value = ""; $("#guestsheet").classList.add("on"); $("#gname").focus(); };
+$("#guestCancel").onclick = () => $("#guestsheet").classList.remove("on");
+$("#guestSave").onclick = () => {
+  const name = $("#gname").value.trim(); if (!name) return toast("Give the guest a name");
+  guests.push({ id: nextGuest++, name, phone: $("#gphone").value.trim(), visits: 0, spent: 0, last: new Date().toISOString().slice(0, 10), usual: $("#gusual").value.trim(), notes: $("#gnotes").value.trim() });
+  $("#guestsheet").classList.remove("on"); drawGuests(); toast(name + " added");
+};
+
+// end of day
+function drawEod() {
+  const sale = closed.reduce((n, c) => n + c.sale, 0), tax = closed.reduce((n, c) => n + c.tax, 0), tip = closed.reduce((n, c) => n + c.tip, 0);
+  const cash = closed.filter((c) => c.method === "Cash").reduce((n, c) => n + c.sale + c.tax + c.tip, 0);
+  const card = closed.filter((c) => c.method === "Card").reduce((n, c) => n + c.sale + c.tax + c.tip, 0);
+  const openTotal = Object.values(checks).reduce((n, c) => n + sums(c).total, 0);
+  $("#eodtiles").innerHTML = [
+    [closed.length, "checks closed"], [money(sale), "food and drink sold"], [money(tip), "tips"], [money(tax), "sales tax collected"],
+    [money(card), "on cards"], [money(cash), "in cash"], [money(openTotal), "still open on the floor"],
+  ].map(([n, l]) => "<div class='tile'><div class='n mono'>" + n + "</div><div class='l'>" + l + "</div></div>").join("");
+  $("#closed tbody").innerHTML = [...closed].reverse().map((c) => "<tr><td class='mono'>" + c.no + "<br><span class='sub'>" + c.seat + "</span></td><td>" + c.guest + "</td><td class='r mono'>" + money(c.sale + c.tax) + "</td><td class='r mono'>" + money(c.tip) + "</td><td>" + c.method + "</td><td>" + timeOf(c.at) + "</td></tr>").join("") || "<tr><td colspan='6' class='empty'>No checks closed yet today.</td></tr>";
+  const agg = {}; for (const c of closed) for (const l of c.lines) { agg[l.name] = agg[l.name] || { q: 0, s: 0 }; agg[l.name].q += l.qty; agg[l.name].s += l.qty * l.price; }
+  $("#topsell tbody").innerHTML = Object.entries(agg).sort((a, b) => b[1].s - a[1].s).slice(0, 8).map(([n, v]) => "<tr><td>" + n + "</td><td class='r mono'>" + v.q + "</td><td class='r mono'>" + money(v.s) + "</td></tr>").join("") || "<tr><td colspan='3' class='empty'>Nothing sold yet.</td></tr>";
+}
+
+// close sheets on backdrop tap
+document.querySelectorAll(".sheet").forEach((s) => s.addEventListener("click", (e) => { if (e.target === s) s.classList.remove("on"); }));
+
+updateKcount(); drawFloor();
+setInterval(() => { if ($("#v-floor").classList.contains("on")) drawFloor(); if ($("#v-kitchen").classList.contains("on")) drawKitchen(); }, 30000);
+</script>
+
+</body>
+</html>
