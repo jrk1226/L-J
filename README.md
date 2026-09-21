@@ -15,10 +15,11 @@ Managers can change these under Settings.
 ## What is in it
 
 - **Order** - tables across the top, menu in the middle, the check on the right. Search box, a Quick row of what gets rung up most, seats on a check, choices (Hot, Medium rare, No onions) and kitchen notes on every line. Hold a tile to add more than one or to 86 it for the night. Undo on the last thing you did.
-- **Send** splits food to the kitchen and drinks to the bar. **Print check** prints an 80mm slip with tip lines.
+- **Send** splits food to the Kitchen tab and drinks to the Bar tab. Each tab only shows its own tickets, with its own count on the rail. **Print check** prints an 80mm slip with tip lines.
 - **Pay** - whole check, one seat, or split evenly. Tip buttons, "Flip to guest" so they pick the tip on the screen, cash with change back, a pretend card reader, house accounts. Receipt with a QR code to join the guest list.
 - **Void** always asks why and lands in the Voids report. Voiding something already sent needs a manager PIN.
-- **Kitchen** - tickets in order, amber after 8 minutes and red after 12, Ready and Print.
+- **Kitchen** - food tickets in order, amber after 8 minutes and red after 12, Ready and Print.
+- **Bar** - drink tickets only, amber after 5 minutes and red after 8, Made and Print.
 - **Guests** - regulars, birthdays this week, who has not been in for 30 days, house account tabs and statements. Tap a phone number to text. A QR code lets guests add themselves.
 - **Reports** - today, by server, by hour, by day of week, tips owed at close, closed checks with reprint, voids.
 - **Settings** (managers) - menu items with photos and choices, categories, staff and PINs, big-finger mode, light or dark look, tax rate, tip buttons, reset to sample data.

@@ -332,6 +332,7 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
     <div class="logo">L&amp;J</div>
     <button data-v="order" class="on"><i>OR</i>Order</button>
     <button data-v="kitchen"><i>KT</i>Kitchen<span class="n" id="kcount"></span></button>
+    <button data-v="bar"><i>BR</i>Bar<span class="n" id="bcount"></span></button>
     <button data-v="guests"><i>GU</i>Guests</button>
     <button data-v="reports"><i>RP</i>Reports</button>
     <button data-v="settings"><i>ST</i>Settings</button>
@@ -372,8 +373,14 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 
     <!-- KITCHEN -->
     <section class="view" id="v-kitchen">
-      <div class="head"><div><h2>Kitchen and bar</h2><div class="sub">Every Send lands here. Amber after 8 minutes, red after 12.</div></div></div>
+      <div class="head"><div><h2>Kitchen</h2><div class="sub">Food only. Every Send lands here. Amber after 8 minutes, red after 12.</div></div></div>
       <div class="kds" id="kds"></div>
+    </section>
+
+    <!-- BAR -->
+    <section class="view" id="v-bar">
+      <div class="head"><div><h2>Bar</h2><div class="sub">Drinks only. When a server sends a round, it shows up here, not in the kitchen. Amber after 5 minutes, red after 8.</div></div></div>
+      <div class="kds" id="bds"></div>
     </section>
 
     <!-- GUESTS -->
@@ -693,9 +700,10 @@ function seed() {
   };
   const kitchen = [
     { id: 1, seat: "Table 4", at: Date.now() - 31 * 60000, items: [{ name: "Calamari", qty: 1, note: "extra lemon", mods: [], seat: 1 }, { name: "Steak frites", qty: 2, note: "", mods: ["Medium rare"], seat: 1 }], done: true, kind: "Kitchen" },
-    { id: 2, seat: "Table 1", at: Date.now() - 9 * 60000, items: [{ name: "Smash burger", qty: 2, note: "one no onions", mods: ["Medium"], seat: 1 }, { name: "Caesar salad", qty: 1, note: "", mods: [], seat: 2 }], done: false, kind: "Kitchen" },
+    { id: 2, seat: "Table 1", at: Date.now() - 9 * 60000, items: [{ name: "Smash burger", qty: 2, note: "one no onions", mods: ["Medium"], seat: 1 }, { name: "Caesar salad", qty: 1, note: "", mods: [], seat: 2 }], done: false, kind: "Kitchen", by: "Sam" },
+    { id: 3, seat: "Bar 3", at: Date.now() - 3 * 60000, items: [{ name: "Old Fashioned", qty: 2, note: "", mods: ["Rocks"], seat: 1 }, { name: "Stella Artois", qty: 1, note: "", mods: [], seat: 1 }], done: false, kind: "Bar", by: "Alex" },
   ];
-  return { v: 3, cats, items, staff, guests, seats, checks, kitchen, closed, voids: [], recent: ["i1", "i18", "i23", "i6"], settings, nextNo: no, nextGuest: 6, nextTicket: 3 };
+  return { v: 3, cats, items, staff, guests, seats, checks, kitchen, closed, voids: [], recent: ["i1", "i18", "i23", "i6"], settings, nextNo: no, nextGuest: 6, nextTicket: 4 };
 }
 let S = load();
 function load() { try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 3) return s; } } catch (e) {} return seed(); }
@@ -766,7 +774,7 @@ function needManager(why) {
 function show(v) {
   $$(".view").forEach((s) => s.classList.toggle("on", s.id === "v-" + v));
   $$("#tabs button[data-v]").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
-  if (v === "order") drawOrder(); if (v === "kitchen") drawKitchen(); if (v === "guests") drawGuests(); if (v === "reports") drawReports(); if (v === "settings") drawSettings();
+  if (v === "order") drawOrder(); if (v === "kitchen") drawKitchen(); if (v === "bar") drawBar(); if (v === "guests") drawGuests(); if (v === "reports") drawReports(); if (v === "settings") drawSettings();
   window.scrollTo({ top: 0 });
 }
 $("#tabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b && b.dataset.v) show(b.dataset.v); });
@@ -919,7 +927,7 @@ $("#btnSend").onclick = () => {
   const c = S.checks[cur]; const seat = seatOf(cur); const items = c.lines.filter((l) => !l.sent);
   snap();
   const food = items.filter((l) => (catOf((itemOf(l.itemId) || {}).cat) || {}).kitchen); const bar = items.filter((l) => !food.includes(l));
-  const tk = (list, kind) => ({ id: S.nextTicket++, seat: seat.label, at: Date.now(), items: list.map((l) => ({ name: l.name, qty: l.qty, note: l.note, mods: l.mods, seat: l.seat })), done: false, kind });
+  const tk = (list, kind) => ({ id: S.nextTicket++, seat: seat.label, at: Date.now(), items: list.map((l) => ({ name: l.name, qty: l.qty, note: l.note, mods: l.mods, seat: l.seat })), done: false, kind, by: me ? me.name : "" });
   if (food.length) S.kitchen.push(tk(food, "Kitchen")); if (bar.length) S.kitchen.push(tk(bar, "Bar"));
   items.forEach((l) => (l.sent = true)); c.touched = Date.now(); save(); drawTicket(); drawStrip(); updateKcount();
   toast("Sent " + (food.length ? food.length + " to the kitchen" : "") + (food.length && bar.length ? " and " : "") + (bar.length ? bar.length + " to the bar" : ""), true);
@@ -1062,17 +1070,19 @@ function printClosed(cl) {
 // ============================================================
 //  KITCHEN AND BAR
 // ============================================================
-function updateKcount() { const n = S.kitchen.filter((k) => !k.done).length; $("#kcount").textContent = n ? n : ""; }
-function drawKitchen() {
-  const K = $("#kds"); K.innerHTML = "";
-  const openT = S.kitchen.filter((k) => !k.done).sort((a, b) => a.at - b.at);
-  if (!openT.length) K.innerHTML = "<div class='empty' style='grid-column:1/-1'>Nothing waiting. Send an order from a check and it shows up here.</div>";
+function updateKcount() { $("#kcount").textContent = S.kitchen.filter((k) => !k.done && k.kind === "Kitchen").length || ""; $("#bcount").textContent = S.kitchen.filter((k) => !k.done && k.kind === "Bar").length || ""; }
+function drawKitchen() { drawTickets("Kitchen", $("#kds"), 8, 12); }
+function drawBar() { drawTickets("Bar", $("#bds"), 5, 8); }
+function drawTickets(kind, K, warnAt, oldAt) {
+  K.innerHTML = "";
+  const openT = S.kitchen.filter((k) => !k.done && k.kind === kind).sort((a, b) => a.at - b.at);
+  if (!openT.length) K.innerHTML = "<div class='empty' style='grid-column:1/-1'>" + (kind === "Bar" ? "No drinks waiting. Send a round from a check and it shows up here." : "Nothing waiting. Send an order from a check and it shows up here.") + "</div>";
   for (const k of openT) {
-    const m = mins(k.at); const d = document.createElement("div"); d.className = "kt" + (m >= 12 ? " old" : m >= 8 ? " warn" : "");
-    d.innerHTML = "<div class='h'><span>" + esc(k.seat) + " <small>" + esc(k.kind) + "</small></span><span class='tm mono'>" + m + " min</span></div><ul>" +
+    const m = mins(k.at); const d = document.createElement("div"); d.className = "kt" + (m >= oldAt ? " old" : m >= warnAt ? " warn" : "");
+    d.innerHTML = "<div class='h'><span>" + esc(k.seat) + " <small>" + esc(k.by || "") + "</small></span><span class='tm mono'>" + m + " min</span></div><ul>" +
       k.items.map((i) => "<li><b>" + i.qty + "</b><span>" + esc(i.name) + (i.seat > 1 ? " <small>seat " + i.seat + "</small>" : "") + "</span>" + (i.mods && i.mods.length || i.note ? "<small>" + esc([...(i.mods || []), i.note].filter(Boolean).join(", ")) + "</small>" : "") + "</li>").join("") + "</ul><div class='acts'></div>";
     const pr = document.createElement("button"); pr.className = "btn quiet"; pr.textContent = "Print"; pr.onclick = () => printHTML(receiptHead(k.kind + " ticket - " + k.seat, timeOf(k.at)) + k.items.map((i) => "<div><b>" + i.qty + " " + esc(i.name) + "</b>" + (i.seat > 1 ? " (seat " + i.seat + ")" : "") + (i.mods && i.mods.length || i.note ? "<br>&nbsp;&nbsp;" + esc([...(i.mods || []), i.note].filter(Boolean).join(", ")) : "") + "</div>").join(""));
-    const b = document.createElement("button"); b.className = "btn good"; b.textContent = "Ready"; b.onclick = () => { k.done = true; save(); updateKcount(); drawKitchen(); toast(k.seat + " is up"); };
+    const b = document.createElement("button"); b.className = "btn good"; b.textContent = kind === "Bar" ? "Made" : "Ready"; b.onclick = () => { k.done = true; save(); updateKcount(); drawTickets(kind, K, warnAt, oldAt); toast(k.seat + (kind === "Bar" ? " drinks are up" : " is up")); };
     d.querySelector(".acts").append(pr, b); K.appendChild(d);
   }
 }
@@ -1259,7 +1269,7 @@ try { applyLook(localStorage.getItem("lj-look") === "light" ? "light" : "dark");
 applyBig(); drawLockHint(); updateKcount(); tickClock();
 if (location.hash === "#join") showJoin();
 else { let saved = null; try { saved = S.staff.find((s) => s.id === sessionStorage.getItem("lj-me")); } catch (e) {} setMe(saved || null); show("order"); }
-setInterval(() => { tickClock(); if ($("#v-order").classList.contains("on")) { drawStrip(); } if ($("#v-kitchen").classList.contains("on")) drawKitchen(); }, 30000);
+setInterval(() => { tickClock(); if ($("#v-order").classList.contains("on")) { drawStrip(); } if ($("#v-kitchen").classList.contains("on")) drawKitchen(); if ($("#v-bar").classList.contains("on")) drawBar(); }, 30000);
 window.addEventListener("hashchange", () => { if (location.hash === "#join") showJoin(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") { $$(".sheet.on").forEach((s) => s.classList.remove("on")); $("#flip").classList.remove("on"); } });
 </script>
