@@ -82,6 +82,8 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 .rail .clock{color:var(--faint);font-size:11px;text-align:center;line-height:1.3}
 .rail .look{margin-top:8px;width:72px;padding:8px 4px;font-size:11px;color:var(--muted);box-shadow:inset 0 0 0 1px var(--line);border-radius:10px}
 .rail .look i{display:none}
+.rail .venue{white-space:nowrap;width:72px;margin:-8px 0 8px;padding:7px 4px;font-size:11px;font-weight:800;color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber);border-radius:10px;background:var(--amber-soft)}
+.rail .venue::after{content:" \25BE"}
 .rail .off{width:72px;font-size:10.5px;color:var(--amber);font-weight:800;text-align:center}
 .page{padding:16px 22px 40px;min-width:0}
 .head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 14px}
@@ -91,6 +93,7 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
   .rail{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;flex-direction:row;justify-content:space-around;border-right:0;border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:20}
   .logo,.rail .clock,.rail .me,.rail .off{display:none}
   .rail .look{margin-top:0;width:auto;flex:0 0 auto;padding:8px 8px;box-shadow:none}
+  .rail .venue{margin:0;width:auto;flex:0 0 auto;padding:8px 8px}
   .rail{overflow-x:auto;justify-content:flex-start;gap:2px}
   .rail button{width:auto;flex:1 0 58px;padding:8px 2px 6px;font-size:10.5px}
   .page{padding:12px 12px 96px}
@@ -446,6 +449,7 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 <div class="shell" id="shell">
   <nav class="rail" id="tabs" aria-label="Sections">
     <div class="logo">L&amp;J</div>
+    <button class="venue" id="venuebtn" type="button" title="Switch between the restaurant and the bar systems">Restaurant</button>
     <button data-v="floor" class="on"><i>FL</i>Floor<span class="n" id="rcount"></span></button>
     <button data-v="kitchen"><i>KT</i>Kitchen<span class="n" id="kcount"></span></button>
     <button data-v="tabs"><i>TB</i>Bar tabs<span class="n" id="tcount"></span></button>
@@ -816,7 +820,10 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 //  L&J Point of Sale, Phase 1 build.
 //  One file. Remembered on this device (no database yet).
 // ============================================================
-const KEY = "lj-pos-v4";
+// Two independent systems live side by side: the restaurant and the bar. Each keeps its own floor, menu and day.
+let VENUE = "restaurant"; try { VENUE = localStorage.getItem("lj-venue") === "bar" ? "bar" : "restaurant"; } catch (e) {}
+const VENUES = { restaurant: "Restaurant", bar: "Bar" };
+const KEY = "lj-pos-v4-" + VENUE;
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
 const pad2 = (n) => String(n).padStart(2, "0");
@@ -903,6 +910,22 @@ function seed() {
     { id: "TO", label: "Takeout", seats: 0, zone: "Patio", x: 80, y: 12, w: 17, h: 76, shape: "sq" },
   ];
   const settings = { big: false, taxRate: 0.08875, tips: [18, 20, 22], bigVoid: 100, bigDiscount: 25 };
+  if (VENUE === "bar") {
+    // the bar system: stools and high tops, a drinks-first menu, one kitchen station for bar food
+    stations.length = 0; stations.push({ id: "bar", name: "Bar" }, { id: "kitchen", name: "Kitchen" });
+    cats.length = 0; cats.push({ id: "drafts", name: "Beer", station: "bar", course: "drink" }, { id: "cocktails", name: "Cocktails", station: "bar", course: "drink" }, { id: "shots", name: "Shots", station: "bar", course: "drink" }, { id: "wine", name: "Wine", station: "bar", course: "drink" }, { id: "na", name: "Soft drinks", station: "bar", course: "drink" }, { id: "starters", name: "Bar food", station: "kitchen", course: "app" });
+    for (const it of items) { if (it.cat === "salads") it.cat = "starters"; if (it.cat === "burgers" || it.cat === "mains" || it.cat === "desserts") it.cat = "starters"; if (it.station === "fry") it.station = ""; }
+    const keepNames = new Set(["Bud Light", "Blue Point Toasted Lager", "Montauk Wave Chaser IPA", "Guinness", "Stella Artois", "Old Fashioned", "Margarita", "Espresso Martini", "Moscow Mule", "Aperol Spritz", "Well drink", "House red", "House white", "Prosecco", "Soda", "Sparkling water", "Wings (10)", "Mozzarella sticks", "Nachos", "Cheeseburger"]);
+    for (let i = items.length - 1; i >= 0; i--) if (!keepNames.has(items[i].name)) items.splice(i, 1);
+    add("shots", "Tequila shot", 8); add("shots", "Fireball", 7); add("shots", "Jameson", 9); add("shots", "Lemon drop", 8); add("shots", "Green tea shot", 9); add("shots", "Pickleback", 8);
+    add("cocktails", "Vodka soda", 10, { mods: ["mixer"] }); add("cocktails", "Tito's soda", 12); add("cocktails", "Jack and Coke", 11); add("cocktails", "Rum punch", 12);
+    add("drafts", "Bucket of 5 domestics", 25); add("drafts", "Coors Light", 6); add("drafts", "Corona", 7); add("drafts", "Michelob Ultra", 6);
+    add("starters", "Fries", 7); add("starters", "Pretzel with cheese", 10); add("starters", "Sliders (3)", 14, { mods: ["cheese"] });
+    tables.length = 0;
+    for (let i = 1; i <= 10; i++) tables.push({ id: "B" + i, label: "Bar " + i, seats: 1, zone: "Bar rail", x: 3 + (i - 1) * 9.6, y: 18, w: 8.6, h: 64, shape: "bar" });
+    tables.push({ id: "H1", label: "High top 1", seats: 4, zone: "Floor", x: 3, y: 10, w: 14, h: 80, shape: "round" }, { id: "H2", label: "High top 2", seats: 4, zone: "Floor", x: 21, y: 10, w: 14, h: 80, shape: "round" }, { id: "H3", label: "High top 3", seats: 4, zone: "Floor", x: 39, y: 10, w: 14, h: 80, shape: "round" }, { id: "H4", label: "High top 4", seats: 4, zone: "Floor", x: 57, y: 10, w: 14, h: 80, shape: "round" }, { id: "L1", label: "Lounge", seats: 8, zone: "Floor", x: 76, y: 10, w: 21, h: 80, shape: "sq" });
+    tables.push({ id: "G1", label: "Pool table", seats: 6, zone: "Game room", x: 3, y: 12, w: 30, h: 76, shape: "sq" }, { id: "G2", label: "Darts", seats: 4, zone: "Game room", x: 37, y: 12, w: 20, h: 76, shape: "sq" }, { id: "TO", label: "Takeout", seats: 0, zone: "Game room", x: 80, y: 12, w: 17, h: 76, shape: "sq" });
+  }
   const giftCards = { "GIFT-1234": 50, "GIFT-5555": 120 };
 
   // two weeks of closed checks so the manager screen has something to show
@@ -926,28 +949,33 @@ function seed() {
   }
   closed.sort((a, b) => a.at - b.at);
   const L = (itemId, name, price, qty, guest, mods, note, status, kstatus, by) => ({ id: uid(), itemId, name, price, qty, guest, mods: mods || [], note: note || "", status, kstatus: kstatus || "", sentAt: status === "sent" ? Date.now() - 20 * 60000 : null, comp: null, paid: false, by, hold: status === "held" });
+  const T = (id) => (VENUE === "bar" ? { T4: "H1", B2: "B2", T1: "H3" }[id] || id : id);
   const checks = {
-    c1: { id: "c1", no: no++, tableId: "T4", tab: null, server: "s2", guests: 3, opened: Date.now() - 32 * 60000, touched: Date.now() - 12 * 60000, guestId: 3, allergy: "", requested: false, payments: [], parts: null, lines: [
+    c1: { id: "c1", no: no++, tableId: T("T4"), tab: null, server: "s2", guests: 3, opened: Date.now() - 32 * 60000, touched: Date.now() - 12 * 60000, guestId: 3, allergy: "", requested: false, payments: [], parts: null, lines: [
       L("i29", "Steak frites", 34, 1, 1, [{ g: "temp", name: "Medium rare", price: 0 }], "", "sent", "served", "Sam"),
       L("i29", "Steak frites", 34, 1, 2, [{ g: "temp", name: "Medium", price: 0 }], "", "sent", "served", "Sam"),
       L("i12", "House red", 11, 2, 3, [], "", "sent", "served", "Sam"),
       L("i24", "Calamari", 17, 1, 1, [], "extra lemon", "sent", "served", "Sam"),
       L("i33", "Cheesecake", 9, 1, 2, [], "", "held", "", "Sam")] },
-    c2: { id: "c2", no: no++, tableId: "B2", tab: null, server: "s4", guests: 1, opened: Date.now() - 6 * 60000, touched: Date.now() - 60000, guestId: 1, allergy: "", requested: false, payments: [], parts: null, lines: [
+    c2: { id: "c2", no: no++, tableId: T("B2"), tab: null, server: "s4", guests: 1, opened: Date.now() - 6 * 60000, touched: Date.now() - 60000, guestId: 1, allergy: "", requested: false, payments: [], parts: null, lines: [
       L("i2", "Blue Point Toasted Lager", 8, 2, 1, [], "", "new", "", "Mike"),
       L("i21", "Wings (10)", 16, 1, 1, [{ g: "wingsauce", name: "Hot", price: 0 }], "", "new", "", "Mike")] },
-    c3: { id: "c3", no: no++, tableId: "T1", tab: null, server: "s3", guests: 2, opened: Date.now() - 14 * 60000, touched: Date.now() - 4 * 60000, guestId: 4, allergy: "Peanut", requested: false, payments: [], parts: null, lines: [
+    c3: { id: "c3", no: no++, tableId: T("T1"), tab: null, server: "s3", guests: 2, opened: Date.now() - 14 * 60000, touched: Date.now() - 4 * 60000, guestId: 4, allergy: "Peanut", requested: false, payments: [], parts: null, lines: [
       L("i26", "Cheeseburger", 18, 1, 1, [{ g: "temp", name: "Medium", price: 0 }, { g: "toppings", name: "No onion", price: 0 }, { g: "addons", name: "Bacon", price: 3 }, { g: "side", name: "Fries", price: 0 }], "", "sent", "cooking", "Alex"),
       L("i25", "Caesar salad", 13, 1, 2, [{ g: "protein", name: "Chicken", price: 5 }], "", "sent", "cooking", "Alex"),
       L("i7", "Margarita", 13, 2, 2, [{ g: "margstyle", name: "Rocks", price: 0 }], "", "sent", "ready", "Alex")] },
     c4: { id: "c4", no: no++, tableId: null, tab: { name: "Jen, red jacket", phone: "", card: "4242" }, server: "s4", guests: 1, opened: Date.now() - 50 * 60000, touched: Date.now() - 9 * 60000, guestId: null, allergy: "", requested: false, payments: [], parts: null, lines: [
       L("i6", "Old Fashioned", 14, 2, 1, [{ g: "rocks", name: "Rocks", price: 0 }], "", "sent", "served", "Mike")] },
   };
+  if (VENUE === "bar") {
+    checks.c1.lines = [L("i26", "Cheeseburger", 18, 1, 1, [{ g: "temp", name: "Medium", price: 0 }, { g: "side", name: "Fries", price: 0 }], "", "sent", "served", "Sam"), L("i26", "Cheeseburger", 18, 1, 2, [{ g: "temp", name: "Well done", price: 0 }, { g: "side", name: "Fries", price: 0 }], "", "sent", "served", "Sam"), L("i2", "Blue Point Toasted Lager", 8, 2, 3, [], "", "sent", "served", "Sam"), L("i21", "Wings (10)", 16, 1, 1, [{ g: "wingsauce", name: "BBQ", price: 0 }], "", "sent", "served", "Sam")];
+    checks.c3.lines = [L("i26", "Cheeseburger", 18, 1, 1, [{ g: "temp", name: "Medium", price: 0 }, { g: "toppings", name: "No onion", price: 0 }, { g: "addons", name: "Bacon", price: 3 }, { g: "side", name: "Fries", price: 0 }], "", "sent", "cooking", "Alex"), L("i23", "Nachos", 15, 1, 2, [], "", "sent", "cooking", "Alex"), L("i7", "Margarita", 13, 2, 2, [{ g: "margstyle", name: "Rocks", price: 0 }], "", "sent", "ready", "Alex")];
+  }
   const tickets = [
-    { id: 1, checkId: "c1", table: "Table 4", server: "Sam", station: "grill", at: Date.now() - 31 * 60000, status: "served", readyAt: Date.now() - 19 * 60000, lines: [{ lineId: checks.c1.lines[0].id, name: "Steak frites", qty: 1, guest: 1, mods: ["Medium rare"], note: "" }, { lineId: checks.c1.lines[1].id, name: "Steak frites", qty: 1, guest: 2, mods: ["Medium"], note: "" }], allergy: "" },
-    { id: 2, checkId: "c3", table: "Table 1", server: "Alex", station: "grill", at: Date.now() - 9 * 60000, status: "cooking", readyAt: null, lines: [{ lineId: checks.c3.lines[0].id, name: "Cheeseburger", qty: 1, guest: 1, mods: ["Medium", "No onion", "Bacon", "Fries"], note: "" }], allergy: "Peanut" },
-    { id: 3, checkId: "c3", table: "Table 1", server: "Alex", station: "cold", at: Date.now() - 9 * 60000, status: "cooking", readyAt: null, lines: [{ lineId: checks.c3.lines[1].id, name: "Caesar salad", qty: 1, guest: 2, mods: ["Chicken"], note: "" }], allergy: "Peanut" },
-    { id: 4, checkId: "c3", table: "Table 1", server: "Alex", station: "bar", at: Date.now() - 9 * 60000, status: "ready", readyAt: Date.now() - 2 * 60000, lines: [{ lineId: checks.c3.lines[2].id, name: "Margarita", qty: 2, guest: 2, mods: ["Rocks"], note: "" }], allergy: "" },
+    { id: 1, checkId: "c1", table: VENUE === "bar" ? "High top 1" : "Table 4", server: "Sam", station: VENUE === "bar" ? "kitchen" : "grill", at: Date.now() - 31 * 60000, status: "served", readyAt: Date.now() - 19 * 60000, lines: [{ lineId: checks.c1.lines[0].id, name: checks.c1.lines[0].name, qty: 1, guest: 1, mods: checks.c1.lines[0].mods.map((m) => m.name), note: "" }, { lineId: checks.c1.lines[1].id, name: checks.c1.lines[1].name, qty: 1, guest: 2, mods: checks.c1.lines[1].mods.map((m) => m.name), note: "" }], allergy: "" },
+    { id: 2, checkId: "c3", table: VENUE === "bar" ? "High top 3" : "Table 1", server: "Alex", station: VENUE === "bar" ? "kitchen" : "grill", at: Date.now() - 9 * 60000, status: "cooking", readyAt: null, lines: [{ lineId: checks.c3.lines[0].id, name: "Cheeseburger", qty: 1, guest: 1, mods: ["Medium", "No onion", "Bacon", "Fries"], note: "" }], allergy: "Peanut" },
+    { id: 3, checkId: "c3", table: VENUE === "bar" ? "High top 3" : "Table 1", server: "Alex", station: VENUE === "bar" ? "kitchen" : "cold", at: Date.now() - 9 * 60000, status: "cooking", readyAt: null, lines: [{ lineId: checks.c3.lines[1].id, name: checks.c3.lines[1].name, qty: 1, guest: 2, mods: checks.c3.lines[1].mods.map((m) => m.name), note: "" }], allergy: "Peanut" },
+    { id: 4, checkId: "c3", table: VENUE === "bar" ? "High top 3" : "Table 1", server: "Alex", station: "bar", at: Date.now() - 9 * 60000, status: "ready", readyAt: Date.now() - 2 * 60000, lines: [{ lineId: checks.c3.lines[2].id, name: "Margarita", qty: 2, guest: 2, mods: ["Rocks"], note: "" }], allergy: "" },
   ];
   const favs = { s4: { i1: 40, i6: 22, i7: 18, i11: 31, i3: 15 }, s2: { i26: 20, i21: 14, i12: 12, i29: 9, i1: 8 }, s3: { i26: 12, i25: 10, i7: 9, i2: 8 } };
   return { v: 4, stations, cats, modGroups, items, staff, guests, tables, checks, tickets, closed, voids: [], audit: [], favs, settings, giftCards, nextNo: no, nextGuest: 6, nextTicket: 5, recentClosed: {} };
@@ -961,7 +989,7 @@ const tableOf = (id) => S.tables.find((t) => t.id === id);
 const tableName = (t) => (t ? (/^\d+$/.test(t.label) ? "Table " + t.label : t.label) : "");
 const itemOf = (id) => S.items.find((i) => i.id === id);
 const catOf = (id) => S.cats.find((c) => c.id === id);
-const stationOf = (id) => S.stations.find((s) => s.id === id);
+const stationOf = (id) => S.stations.find((s) => s.id === id) || { id, name: id ? id[0].toUpperCase() + id.slice(1) : "Kitchen" };
 const staffOf = (id) => S.staff.find((s) => s.id === id);
 const staffName = (id) => (staffOf(id) || {}).name || "";
 const guestOf = (id) => S.guests.find((g) => g.id === id);
@@ -971,7 +999,7 @@ const TAX = () => S.settings.taxRate;
 const checkOfTable = (tid) => Object.values(S.checks).find((c) => c.tableId === tid);
 const checkLabel = (c) => c.tableId ? tableName(tableOf(c.tableId)) : "Tab: " + ((c.tab || {}).name || "no name");
 function lineTotal(l) { return (l.price + l.mods.reduce((n, m) => n + (m.price || 0), 0)) * l.qty; }
-function lineStation(l) { const it = itemOf(l.itemId); return (it && it.station) || (catOf((it || {}).cat) || {}).station || "grill"; }
+function lineStation(l) { const it = itemOf(l.itemId); return (it && it.station) || (catOf((it || {}).cat) || {}).station || ((S.stations.find((s) => s.id !== "bar") || S.stations[0] || { id: "kitchen" }).id); }
 function lineCourse(l) { const it = itemOf(l.itemId); return (catOf((it || {}).cat) || {}).course || "entree"; }
 function sums(lines) { const live = lines.filter((l) => !l.comp); const sale = live.reduce((n, l) => n + lineTotal(l), 0); const tax = sale * TAX(); return { sale, tax, total: sale + tax }; }
 function paidSoFar(c) { return c.payments.reduce((n, p) => n + p.amount, 0); }
@@ -1008,6 +1036,14 @@ const lockPad = pinPad($("#pad"), $("#dots"), (v) => {
   $("#lockmsg").textContent = "Tap your four numbers to clock in"; setMe(s); audit("Clocked in"); show(s.role === "cook" ? "kitchen" : s.role === "bartender" ? "tabs" : "floor"); toast("Hi " + s.name);
 });
 $("#lockbtn").onclick = () => { audit("Locked the screen"); setMe(null); };
+// the switch between the two systems
+document.title = "L&J Point of Sale - " + VENUES[VENUE];
+$("#venuebtn").textContent = VENUES[VENUE];
+$("#venuebtn").onclick = async () => {
+  const v = await pick("Which system?", "Two separate systems. Each keeps its own floor, menu and day.", Object.entries(VENUES).map(([k, n]) => ({ label: n + (k === VENUE ? " (you are here)" : ""), sub: k === "restaurant" ? "Dining room, bar and patio, full menu, kitchen stations" : "Bar rail, high tops, game room, drinks-first menu", value: k })));
+  if (!v || v === VENUE) return;
+  save(); try { localStorage.setItem("lj-venue", v); } catch (e) {} location.reload();
+};
 function drawLockHint() { $("#lockhint").innerHTML = "Test PINs: " + S.staff.map((s) => esc(s.name) + " " + s.pin).join(" &middot; ") + "<br>Managers can change these under Settings."; }
 let mgrResolve = null;
 const mgrPad = pinPad($("#mpad"), $("#mdots"), (v) => {
@@ -1101,7 +1137,7 @@ function drawFloor() {
   const zones = [...new Set(S.tables.map((t) => t.zone))];
   for (const z of zones) {
     const h = document.createElement("div"); h.className = "zonehead"; h.textContent = z; W.appendChild(h);
-    const f = document.createElement("div"); f.className = "floor"; f.style.height = (z === "Bar" ? 150 : z === "Patio" ? 170 : 330) + "px";
+    const f = document.createElement("div"); f.className = "floor"; f.style.height = (z === "Bar" || z === "Bar rail" ? 150 : z === "Patio" || z === "Game room" || z === "Floor" ? 190 : 330) + "px";
     for (const t of S.tables.filter((x) => x.zone === z)) {
       const c = checkOfTable(t.id); const st = tableState(t);
       if (mineOnly && (!c || c.server !== (me || {}).id)) continue;
