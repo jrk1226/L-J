@@ -923,14 +923,40 @@ function seed() {
       G("garnish", "Extras", false, 0, 2, ["Extra lime", "No ice", "Salt rim", "Sugar rim", { name: "Top shelf", price: 4 }]),
     ]));
     items.length = 0; n = 1;
-    add("tap", "Bud Light", 6, { img: "images/bud-light.png", mods: ["beersize"] }); add("tap", "Coors Light", 6, { mods: ["beersize"] }); add("tap", "Michelob Ultra", 6, { mods: ["beersize"] }); add("tap", "Blue Point Toasted Lager", 8, { img: "images/blue-point-toasted-lager.png", mods: ["beersize"] }); add("tap", "Montauk Wave Chaser IPA", 8, { img: "images/montauk-wave-chaser.png", mods: ["beersize"] }); add("tap", "Guinness", 8, { img: "images/guinness.png" }); add("tap", "Stella Artois", 8, { img: "images/stella-artois.png", mods: ["beersize"] }); add("tap", "Blue Moon", 7, { mods: ["beersize"] }); add("tap", "Sam Adams", 7, { mods: ["beersize"] }); add("tap", "IPA of the day", 8, { mods: ["beersize"] });
-    add("bottles", "Corona", 7); add("bottles", "Heineken", 7); add("bottles", "Miller Lite", 6); add("bottles", "Modelo", 7); add("bottles", "Budweiser", 6); add("bottles", "White Claw", 7); add("bottles", "High Noon", 8); add("bottles", "Truly", 7); add("bottles", "Bucket of 5 domestics", 25); add("bottles", "Bucket of 5 imports", 30); add("bottles", "Non-alcoholic beer", 6);
-    add("cocktails", "Old Fashioned", 14, { mods: ["pour", "garnish"], img: "images/old-fashioned.jpg", photo: true }); add("cocktails", "Margarita", 13, { mods: ["margstyle", "garnish"], img: "images/margarita.jpg", photo: true }); add("cocktails", "Espresso Martini", 15, { img: "images/espresso-martini.jpg", photo: true }); add("cocktails", "Moscow Mule", 13, { img: "images/moscow-mule.jpg", photo: true }); add("cocktails", "Aperol Spritz", 13, { img: "images/aperol-spritz.jpg", photo: true });
-    add("cocktails", "Vodka soda", 10, { mods: ["garnish"] }); add("cocktails", "Tito's soda", 12, { mods: ["garnish"] }); add("cocktails", "Gin and tonic", 11, { img: "images/well-drink.jpg", photo: true, mods: ["garnish"] }); add("cocktails", "Jack and Coke", 11); add("cocktails", "Rum and Coke", 10); add("cocktails", "Mojito", 13); add("cocktails", "Cosmopolitan", 13); add("cocktails", "Manhattan", 14, { mods: ["pour"] }); add("cocktails", "Negroni", 14); add("cocktails", "Whiskey Sour", 13); add("cocktails", "Long Island", 14); add("cocktails", "Paloma", 12); add("cocktails", "Bloody Mary", 12, { mods: ["garnish"] }); add("cocktails", "Mimosa", 10); add("cocktails", "Well drink", 9, { mods: ["liquor", "mixer2"] });
-    add("shots", "Tequila shot", 8, { mods: ["shotcount"] }); add("shots", "Fireball", 7, { mods: ["shotcount"] }); add("shots", "Jameson", 9, { mods: ["shotcount"] }); add("shots", "Lemon drop", 8, { mods: ["shotcount"] }); add("shots", "Green tea shot", 9, { mods: ["shotcount"] }); add("shots", "Pickleback", 8, { mods: ["shotcount"] }); add("shots", "Jager bomb", 9, { mods: ["shotcount"] }); add("shots", "Kamikaze", 8, { mods: ["shotcount"] }); add("shots", "Vegas bomb", 9, { mods: ["shotcount"] }); add("shots", "Casamigos", 12, { mods: ["shotcount"] }); add("shots", "Don Julio 1942", 25, { mods: ["shotcount"] });
-    add("liquor", "Tito's", 11, { mods: ["pour", "mixer2"] }); add("liquor", "Grey Goose", 13, { mods: ["pour", "mixer2"] }); add("liquor", "Ketel One", 12, { mods: ["pour", "mixer2"] }); add("liquor", "Bombay Sapphire", 12, { mods: ["pour", "mixer2"] }); add("liquor", "Hendrick's", 13, { mods: ["pour", "mixer2"] }); add("liquor", "Bacardi", 10, { mods: ["pour", "mixer2"] }); add("liquor", "Captain Morgan", 10, { mods: ["pour", "mixer2"] }); add("liquor", "Casamigos Blanco", 14, { mods: ["pour", "mixer2"] }); add("liquor", "Patron", 14, { mods: ["pour", "mixer2"] }); add("liquor", "Jack Daniel's", 11, { mods: ["pour", "mixer2"] }); add("liquor", "Jameson", 11, { mods: ["pour", "mixer2"] }); add("liquor", "Maker's Mark", 12, { mods: ["pour", "mixer2"] }); add("liquor", "Bulleit", 12, { mods: ["pour", "mixer2"] }); add("liquor", "Johnnie Walker Black", 14, { mods: ["pour", "mixer2"] }); add("liquor", "Hennessy", 14, { mods: ["pour", "mixer2"] }); add("liquor", "Baileys", 10, { mods: ["pour"] });
-    add("wine", "House red", 11, { mods: ["winesize"], img: "images/house-red.jpg", photo: true }); add("wine", "House white", 11, { mods: ["winesize"], img: "images/house-white.jpg", photo: true }); add("wine", "Pinot Grigio", 13, { mods: ["winesize"], img: "images/pinot-grigio.jpg", photo: true }); add("wine", "Cabernet", 14, { mods: ["winesize"], img: "images/cabernet.jpg", photo: true }); add("wine", "Rose", 12, { mods: ["winesize"] }); add("wine", "Prosecco", 12, { mods: ["winesize"], img: "images/prosecco.jpg", photo: true });
-    add("na", "Soda", 3, { mods: ["sodatype"], img: "images/soda.jpg", photo: true }); add("na", "Red Bull", 5); add("na", "Sparkling water", 4, { img: "images/sparkling-water.jpg", photo: true }); add("na", "Iced tea", 3.5, { img: "images/iced-tea.jpg", photo: true }); add("na", "Water", 0); add("na", "Coffee", 3, { img: "images/coffee.jpg", photo: true });
+    const P = (f) => ({ img: "images/" + f + ".jpg", photo: true });
+    const D = (f) => ({ img: "images/" + f + ".png" });
+    const B = (f, x) => Object.assign(P(f), { mods: ["beersize"] }, x || {});
+    const C = (f, x) => Object.assign(P(f), x || {});
+    const SH = (f, x) => Object.assign(P(f), { mods: ["shotcount"] }, x || {});
+    const LQ = (f, x) => Object.assign(P(f), { mods: ["pour", "mixer2"] }, x || {});
+    const WN = (f) => Object.assign(P(f), { mods: ["winesize"] });
+    // On tap
+    add("tap", "Bud Light", 6, Object.assign(D("bud-light"), { mods: ["beersize"] })); add("tap", "Coors Light", 6, B("coors-light")); add("tap", "Michelob Ultra", 6, B("michelob-ultra")); add("tap", "Miller Lite", 6, B("miller-lite")); add("tap", "Yuengling", 6, B("yuengling"));
+    add("tap", "Blue Point Toasted Lager", 8, Object.assign(D("blue-point-toasted-lager"), { mods: ["beersize"] })); add("tap", "Montauk Wave Chaser IPA", 8, Object.assign(D("montauk-wave-chaser"), { mods: ["beersize"] })); add("tap", "Guinness", 8, D("guinness")); add("tap", "Stella Artois", 8, Object.assign(D("stella-artois"), { mods: ["beersize"] }));
+    add("tap", "Blue Moon", 7, B("blue-moon")); add("tap", "Sam Adams", 7, B("sam-adams")); add("tap", "IPA of the day", 8, B("ipa-of-the-day")); add("tap", "Modelo", 7, B("modelo"));
+    // Bottles and cans
+    add("bottles", "Corona", 7, P("corona")); add("bottles", "Heineken", 7, P("heineken")); add("bottles", "Miller Lite", 6, P("miller-lite")); add("bottles", "Modelo", 7, P("modelo")); add("bottles", "Budweiser", 6, P("budweiser")); add("bottles", "Coors Light", 6, P("coors-light")); add("bottles", "Pacifico", 7, P("pacifico")); add("bottles", "Yuengling", 6, P("yuengling"));
+    add("bottles", "White Claw", 7, P("white-claw")); add("bottles", "High Noon", 8, P("high-noon")); add("bottles", "Truly", 7, P("truly")); add("bottles", "Non-alcoholic beer", 6, P("na-beer"));
+    add("bottles", "Bucket of 5 domestics", 25, P("bucket")); add("bottles", "Bucket of 5 imports", 30, P("bucket"));
+    // Cocktails
+    add("cocktails", "Old Fashioned", 14, C("old-fashioned", { mods: ["pour", "garnish"] })); add("cocktails", "Margarita", 13, C("margarita", { mods: ["margstyle", "garnish"] })); add("cocktails", "Frozen margarita", 13, C("margarita", { mods: ["garnish"] })); add("cocktails", "Spicy margarita", 14, C("margarita", { mods: ["margstyle", "garnish"] }));
+    add("cocktails", "Espresso Martini", 15, C("espresso-martini")); add("cocktails", "Moscow Mule", 13, C("moscow-mule")); add("cocktails", "Aperol Spritz", 13, C("aperol-spritz")); add("cocktails", "Dirty martini", 15, C("dirty-martini", { mods: ["liquor", "pour"] })); add("cocktails", "Lemon drop martini", 14, C("lemon-drop-martini"));
+    add("cocktails", "Vodka soda", 10, C("well-drink", { mods: ["garnish"] })); add("cocktails", "Tito's soda", 12, C("well-drink", { mods: ["garnish"] })); add("cocktails", "Gin and tonic", 11, C("well-drink", { mods: ["garnish"] })); add("cocktails", "Gin fizz", 12, C("gin-fizz")); add("cocktails", "Jack and Coke", 11, C("jack-coke")); add("cocktails", "Rum and Coke", 10, C("rum-coke"));
+    add("cocktails", "Mojito", 13, C("mojito", { mods: ["garnish"] })); add("cocktails", "Cosmopolitan", 13, C("cosmopolitan")); add("cocktails", "Manhattan", 14, C("manhattan", { mods: ["pour"] })); add("cocktails", "Negroni", 14, C("negroni")); add("cocktails", "Whiskey Sour", 13, C("whiskey-sour")); add("cocktails", "Amaretto sour", 12, C("amaretto-sour")); add("cocktails", "Long Island", 14, C("long-island")); add("cocktails", "Paloma", 12, C("paloma"));
+    add("cocktails", "Bloody Mary", 12, C("bloody-mary", { mods: ["garnish"] })); add("cocktails", "Mimosa", 10, C("mimosa")); add("cocktails", "Daiquiri", 12, C("daiquiri")); add("cocktails", "Pina colada", 13, C("pina-colada")); add("cocktails", "Sex on the beach", 12, C("sex-on-beach")); add("cocktails", "Tequila sunrise", 12, C("tequila-sunrise")); add("cocktails", "Mai tai", 13, C("mai-tai")); add("cocktails", "Dark and stormy", 13, C("dark-stormy"));
+    add("cocktails", "Sangria", 11, C("sangria")); add("cocktails", "Irish coffee", 11, C("irish-coffee")); add("cocktails", "White Russian", 12, C("white-russian")); add("cocktails", "Well drink", 9, C("well-drink", { mods: ["liquor", "mixer2"] }));
+    // Shots
+    add("shots", "Tequila shot", 8, SH("tequila-shot")); add("shots", "Fireball", 7, SH("fireball")); add("shots", "Jameson", 9, SH("shots-amber")); add("shots", "Jager", 8, SH("jagermeister")); add("shots", "Lemon drop", 8, SH("shots-color")); add("shots", "Green tea shot", 9, SH("shots-color")); add("shots", "Washington apple", 9, SH("shots-color")); add("shots", "Kamikaze", 8, SH("shots-color"));
+    add("shots", "Pickleback", 8, SH("shots-round")); add("shots", "Sambuca", 8, SH("shots-clear")); add("shots", "Rumple Minze", 8, SH("shots-clear")); add("shots", "Baby Guinness", 9, SH("shots-layered")); add("shots", "Jager bomb", 9, SH("shots-flaming")); add("shots", "Vegas bomb", 9, SH("shots-flaming")); add("shots", "Casamigos", 12, SH("casamigos")); add("shots", "Don Julio 1942", 25, SH("don-julio")); add("shots", "Patron", 12, SH("patron"));
+    // Liquor
+    add("liquor", "Tito's", 11, LQ("titos")); add("liquor", "Grey Goose", 13, LQ("grey-goose")); add("liquor", "Ketel One", 12, LQ("ketel-one")); add("liquor", "Absolut", 11, LQ("absolut")); add("liquor", "Bombay Sapphire", 12, LQ("bombay")); add("liquor", "Tanqueray", 12, LQ("tanqueray")); add("liquor", "Hendrick's", 13, LQ("hendricks"));
+    add("liquor", "Bacardi", 10, LQ("bacardi")); add("liquor", "Captain Morgan", 10, LQ("captain-morgan")); add("liquor", "Malibu", 10, LQ("malibu")); add("liquor", "Jose Cuervo", 10, LQ("jose-cuervo")); add("liquor", "Casamigos Blanco", 14, LQ("casamigos")); add("liquor", "Patron", 14, LQ("patron")); add("liquor", "Don Julio", 15, LQ("don-julio"));
+    add("liquor", "Jack Daniel's", 11, LQ("jack-daniels")); add("liquor", "Jameson", 11, LQ("jameson")); add("liquor", "Maker's Mark", 12, LQ("makers-mark")); add("liquor", "Bulleit", 12, LQ("whiskey-rocks")); add("liquor", "Woodford Reserve", 13, LQ("woodford")); add("liquor", "Crown Royal", 12, LQ("crown-royal")); add("liquor", "Southern Comfort", 10, LQ("southern-comfort"));
+    add("liquor", "Johnnie Walker Black", 14, LQ("johnnie-walker")); add("liquor", "Glenlivet 12", 15, LQ("whiskey-neat", { mods: ["pour"] })); add("liquor", "Macallan 12", 18, LQ("whiskey-pour", { mods: ["pour"] })); add("liquor", "Hennessy", 14, LQ("hennessy")); add("liquor", "Jagermeister", 10, LQ("jagermeister", { mods: ["pour"] })); add("liquor", "Baileys", 10, LQ("baileys", { mods: ["pour"] }));
+    // Wine
+    add("wine", "House red", 11, WN("house-red")); add("wine", "House white", 11, WN("house-white")); add("wine", "Pinot Grigio", 13, WN("pinot-grigio")); add("wine", "Sauvignon Blanc", 13, WN("pinot-grigio")); add("wine", "Chardonnay", 13, WN("house-white")); add("wine", "Cabernet", 14, WN("cabernet")); add("wine", "Merlot", 13, WN("house-red")); add("wine", "Pinot Noir", 14, WN("cabernet")); add("wine", "Rose", 12, WN("rose")); add("wine", "Prosecco", 12, WN("prosecco")); add("wine", "Champagne", 16, WN("champagne"));
+    // Soft drinks
+    add("na", "Soda", 3, C("soda", { mods: ["sodatype"] })); add("na", "Red Bull", 5, P("red-bull")); add("na", "Ginger beer", 4, P("ginger-beer")); add("na", "Club soda", 3, P("sparkling-water")); add("na", "Tonic", 3, P("tonic")); add("na", "Sparkling water", 4, P("sparkling-water")); add("na", "Lemonade", 3.5, P("lemonade")); add("na", "Cranberry juice", 3.5, P("cranberry")); add("na", "Iced tea", 3.5, P("iced-tea")); add("na", "Arnold Palmer", 4, P("arnold-palmer")); add("na", "Shirley Temple", 4, P("shirley-temple")); add("na", "Hot tea", 3, P("hot-tea")); add("na", "Coffee", 3, P("coffee")); add("na", "Water", 0, P("water"));
     tables.length = 0;
     for (let i = 1; i <= 16; i++) tables.push({ id: "B" + i, label: "Stool " + i, seats: 1, zone: "Bar", x: 2 + ((i - 1) % 8) * 12.2, y: i <= 8 ? 8 : 56, w: 11, h: 36, shape: "bar" });
   }
@@ -992,10 +1018,31 @@ function seed() {
   ];
   if (VENUE === "bar") tickets.length = 0;
   const favs = { s4: { i1: 40, i6: 22, i7: 18, i11: 31, i3: 15 }, s2: { i26: 20, i21: 14, i12: 12, i29: 9, i1: 8 }, s3: { i26: 12, i25: 10, i7: 9, i2: 8 } };
-  return { v: 4, stations, cats, modGroups, items, staff, guests, tables, checks, tickets, closed, voids: [], audit: [], favs, settings, giftCards, nextNo: no, nextGuest: 6, nextTicket: 5, recentClosed: {} };
+  return { v: 4, menuV: MENU_V, stations, cats, modGroups, items, staff, guests, tables, checks, tickets, closed, voids: [], audit: [], favs, settings, giftCards, nextNo: no, nextGuest: 6, nextTicket: 5, recentClosed: {} };
 }
+const MENU_V = 2; // bump when the built-in menu grows; saved days pick up the new drinks without losing anything
 let S = load();
-function load() { try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 4) return s; } } catch (e) {} return seed(); }
+function load() { try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 4) return refreshMenu(s); } } catch (e) {} return seed(); }
+// Folds new built-in menu items, pictures, categories and choice groups into a saved day. Never touches checks, staff, or anything a manager edited.
+function refreshMenu(s) {
+  if (s.menuV === MENU_V) return s;
+  try {
+    const f = seed();
+    const cats = s.cats || (s.cats = []);
+    f.cats.forEach((c) => { if (!cats.find((x) => x.id === c.id)) cats.push(c); });
+    s.modGroups = s.modGroups || {};
+    Object.keys(f.modGroups).forEach((g) => { if (!s.modGroups[g]) s.modGroups[g] = f.modGroups[g]; });
+    const items = s.items || (s.items = []);
+    let maxN = 0; items.forEach((it) => { const m = /^i(\d+)$/.exec(it.id); if (m) maxN = Math.max(maxN, +m[1]); });
+    f.items.forEach((it) => {
+      const have = items.find((x) => x.cat === it.cat && x.name.toLowerCase() === it.name.toLowerCase());
+      if (!have) items.push(Object.assign({}, it, { id: "i" + (++maxN) }));
+      else if (!have.img && it.img) { have.img = it.img; have.photo = it.photo; }
+    });
+    if (!s.stations || !s.stations.length) s.stations = f.stations;
+  } catch (e) {}
+  s.menuV = MENU_V; return s;
+}
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
 // ---------- lookups ----------
