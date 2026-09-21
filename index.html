@@ -207,6 +207,7 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 .tabchip{border:0;background:var(--panel);box-shadow:inset 0 0 0 1px var(--line);border-radius:12px;padding:10px 14px;text-align:left;display:grid;gap:2px;min-width:140px}
 .tabchip b{font-weight:800}
 .tabchip small{color:var(--muted);font-size:12px}
+.tabchip.add.quick{border-style:solid;border-color:var(--amber);color:var(--amber);font-weight:800}
 .tabchip.add{border:1px dashed var(--line2);box-shadow:none;background:transparent;color:var(--muted);align-content:center;justify-items:center}
 
 /* ---- table / order screen ---- */
@@ -1119,7 +1120,7 @@ const guestName = (id) => (guestOf(id) || {}).name || "walk-in";
 const initials = (n) => n.replace(/^the /i, "").split(/\s+/).slice(0, 2).map((w) => w[0] || "").join("").toUpperCase();
 const TAX = () => S.settings.taxRate;
 const checkOfTable = (tid) => Object.values(S.checks).find((c) => c.tableId === tid);
-const checkLabel = (c) => c.tableId ? tableName(tableOf(c.tableId)) : "Tab: " + ((c.tab || {}).name || "no name");
+const checkLabel = (c) => c.tableId ? tableName(tableOf(c.tableId)) : c.quick ? "Quick sale" : "Tab: " + ((c.tab || {}).name || "no name");
 function lineTotal(l) { return (l.price + l.mods.reduce((n, m) => n + (m.price || 0), 0)) * l.qty; }
 function lineStation(l) { const it = itemOf(l.itemId); return (it && it.station) || (catOf((it || {}).cat) || {}).station || ((S.stations.find((s) => s.id !== "bar") || S.stations[0] || { id: "kitchen" }).id); }
 function lineCourse(l) { const it = itemOf(l.itemId); return (catOf((it || {}).cat) || {}).course || "entree"; }
@@ -1261,8 +1262,8 @@ let mineOnly = false;
 function drawFloor() {
   $("#legend").innerHTML = Object.entries(STATES).filter(([k]) => VENUE !== "bar" || (k !== "sent" && k !== "ready")).map(([k, v]) => "<span><i style='background:" + stateColor(k) + "'></i>" + v + "</span>").join("");
   const openN = Object.values(S.checks).length; const tabsN = Object.values(S.checks).filter((c) => !c.tableId).length;
-  $("#floortools").innerHTML = "<button class='btn sm" + (mineOnly ? " on" : "") + "' id='mineBtn'>" + (VENUE === "bar" ? "My stools" : "My tables") + "</button><button class='btn sm' id='openBtn'>Open checks: " + openN + "</button>" + (tabsN ? "<button class='btn sm' id='tabsBtn'>Bar tabs: " + tabsN + "</button>" : "") + (can("transfer") ? "<button class='btn sm' id='moveBtn'>" + (VENUE === "bar" ? "Move a stool" : "Move a table") + "</button>" : "");
-  $("#mineBtn").onclick = () => { mineOnly = !mineOnly; drawFloor(); };
+  $("#floortools").innerHTML = (VENUE === "bar" ? "<button class='btn sm primary' id='quickBtn'>Quick sale</button>" : "") + "<button class='btn sm" + (mineOnly ? " on" : "") + "' id='mineBtn'>" + (VENUE === "bar" ? "My stools" : "My tables") + "</button><button class='btn sm' id='openBtn'>Open checks: " + openN + "</button>" + (tabsN ? "<button class='btn sm' id='tabsBtn'>Bar tabs: " + tabsN + "</button>" : "") + (can("transfer") ? "<button class='btn sm' id='moveBtn'>" + (VENUE === "bar" ? "Move a stool" : "Move a table") + "</button>" : "");
+  $("#mineBtn").onclick = () => { mineOnly = !mineOnly; drawFloor(); }; const qb = $("#quickBtn"); if (qb) qb.onclick = quickSale;
   $("#openBtn").onclick = openChecksSheet; const tb = $("#tabsBtn"); if (tb) tb.onclick = () => show("tabs"); const mb = $("#moveBtn"); if (mb) mb.onclick = () => moveTableFlow(null);
   drawReady();
   const W = $("#floorwrap"); W.innerHTML = "";
@@ -1304,12 +1305,17 @@ function drawFloor() {
     const h = document.createElement("div"); h.className = "zonehead"; h.textContent = "Open tabs (not on a stool)"; W.appendChild(h);
     const strip = document.createElement("div"); strip.className = "tabs-strip";
     const tabs = Object.values(S.checks).filter((c) => !c.tableId).sort((a, b) => b.touched - a.touched);
-    strip.innerHTML = tabs.map((c) => "<button class='tabchip' data-c='" + c.id + "'><b>" + esc(c.tab.name || "No name") + "</b><small>" + [c.tab.card ? "card " + c.tab.card : "", c.tab.phone].filter(Boolean).join(" - ") + "</small><small class='mono'>" + money(checkTotals(c).total) + " - " + mins(c.opened) + " min - " + esc(staffName(c.server)) + "</small></button>").join("") + "<button class='tabchip add' id='newTabFloor'>+ Open a tab</button>";
-    strip.onclick = (e) => { const b = e.target.closest("button"); if (!b) return; if (b.id === "newTabFloor") return $("#newTab").click(); cur = b.dataset.c; curGuest = 1; show("order"); };
+    strip.innerHTML = tabs.map((c) => "<button class='tabchip' data-c='" + c.id + "'><b>" + esc(c.tab.name || "No name") + "</b><small>" + [c.tab.card ? "card " + c.tab.card : "", c.tab.phone].filter(Boolean).join(" - ") + "</small><small class='mono'>" + money(checkTotals(c).total) + " - " + mins(c.opened) + " min - " + esc(staffName(c.server)) + "</small></button>").join("") + "<button class='tabchip add' id='newTabFloor'>+ Open a tab</button><button class='tabchip add quick' id='quickFloor'>Quick sale - pay now</button>";
+    strip.onclick = (e) => { const b = e.target.closest("button"); if (!b) return; if (b.id === "newTabFloor") return $("#newTab").click(); if (b.id === "quickFloor") return quickSale(); cur = b.dataset.c; curGuest = 1; show("order"); };
     W.appendChild(strip);
   }
 }
 function stateColor(k) { return { available: "var(--faint)", seated: "var(--blue)", entered: "var(--amber)", sent: "var(--amber)", ready: "var(--green)", served: "var(--green)", check: "var(--purple)", paid: "var(--muted)" }[k]; }
+// Quick sale: a walk-up who pays right now. No stool, no tab. Ring it up, take the money, done.
+function quickSale() {
+  const c = { id: uid(), no: S.nextNo++, tableId: null, tab: { name: "Quick sale", phone: "", card: "" }, quick: true, server: me ? me.id : "", guests: 1, opened: Date.now(), touched: Date.now(), guestId: null, allergy: "", requested: false, payments: [], parts: null, lines: [] };
+  S.checks[c.id] = c; audit("Quick sale " + c.no, "", ""); save(); cur = c.id; curGuest = 1; show("order");
+}
 function openTable(tid) {
   let c = checkOfTable(tid);
   if (!c) { const t = tableOf(tid); c = { id: uid(), no: S.nextNo++, tableId: tid, tab: null, server: me ? me.id : "", guests: Math.max(1, Math.min(t.seats || 1, 2)), opened: Date.now(), touched: Date.now(), guestId: null, allergy: "", requested: false, payments: [], parts: null, lines: [] }; S.checks[c.id] = c; audit("Opened check " + c.no, "", tableName(t)); save(); }
@@ -1365,11 +1371,11 @@ $("#q").oninput = () => {
 // ============================================================
 let cur = null, curGuest = 1, cat = "fav", mq = "";
 const curCheck = () => (cur && S.checks[cur]) || null;
-$("#backfloor").onclick = () => show("floor");
+$("#backfloor").onclick = () => { const c = curCheck(); if (c && c.quick && !c.lines.length && !c.payments.length) { delete S.checks[c.id]; cur = null; save(); } show("floor"); };
 function drawOrder() {
   const c = curCheck(); if (!c) { show("floor"); return; }
   const t = c.tableId ? tableOf(c.tableId) : null;
-  $("#tname").textContent = t ? tableName(t) : "Tab: " + (c.tab.name || "no name");
+  $("#tname").textContent = t ? tableName(t) : c.quick ? "Quick sale" : "Tab: " + (c.tab.name || "no name");
   $("#tmeta").innerHTML = "<span><b>" + c.guests + "</b> " + (c.guests === 1 ? "guest" : "guests") + "</span><span><b>" + esc(staffName(c.server)) + "</b></span><span>seated <b>" + mins(c.opened) + " min</b></span><span>check <b>" + c.no + "</b></span>" + (c.guestId ? "<span><b>" + esc(guestName(c.guestId)) + "</b>" + ((guestOf(c.guestId) || {}).vip ? " VIP" : "") + "</span>" : "") + (c.allergy ? "<span style='color:var(--red)'><b>ALLERGY: " + esc(c.allergy) + "</b></span>" : "");
   $("#ttot").textContent = money(checkTotals(c).total);
   drawGuestsBar(); drawLines(); drawMenu();
@@ -1414,7 +1420,7 @@ function drawLines() {
   const s = checkTotals(c); const paid = paidSoFar(c); const T = $("#totals");
   T.innerHTML = c.lines.length ? "<div><span>Subtotal</span><span class='mono'>" + money(s.sale) + "</span></div>" + (s.disc ? "<div><span>Discount " + c.discount.pct + "%</span><span class='mono'>-" + money(s.disc) + "</span></div>" : "") + "<div><span>Tax</span><span class='mono'>" + money(s.tax) + "</span></div>" + (paid ? "<div><span>Paid so far</span><span class='mono'>-" + money(paid) + "</span></div>" : "") + "<div class='grand'><span>" + (paid ? "Still owed" : "Total") + "</span><span class='mono'>" + money(s.total - paid) + "</span></div>" : "";
   const unsent = c.lines.filter((l) => l.status === "new"); const held = c.lines.filter((l) => l.status === "held");
-  $("#btnSend").disabled = !unsent.length; $("#btnSend").textContent = VENUE === "bar" ? (unsent.length ? "Ring up " + unsent.length : "Ring up") : (unsent.length ? "Send " + unsent.length : "Send");
+  $("#btnSend").disabled = !unsent.length; $("#btnSend").textContent = c.quick ? (unsent.length ? "Ring up " + unsent.length + " and pay" : "Ring up and pay") : VENUE === "bar" ? (unsent.length ? "Ring up " + unsent.length : "Ring up") : (unsent.length ? "Send " + unsent.length : "Send");
   const F = $("#firebar"); F.innerHTML = "";
   const heldCourses = [...new Set(held.map(lineCourse))];
   for (const co of heldCourses) { const b = document.createElement("button"); b.className = "btn"; const n = held.filter((l) => lineCourse(l) === co).length; b.textContent = "Fire " + COURSES[co].toLowerCase() + " (" + n + ")"; b.onclick = () => fireCourse(co); F.appendChild(b); }
@@ -1571,7 +1577,7 @@ $("#whygo").onclick = () => {
 function managerAlert(msg) { S.alerts = S.alerts || []; S.alerts.push({ at: Date.now(), msg }); save(); }
 
 // ---------- send, hold, fire ----------
-$("#btnSend").onclick = () => { snap(); sendNow(); };
+$("#btnSend").onclick = () => { snap(); sendNow(); const c = curCheck(); if (c && c.quick && c.lines.length) openParts(); };
 function sendNow(only) {
   const c = curCheck(); const t = c.tableId ? tableOf(c.tableId) : null;
   const lines = (only || c.lines.filter((l) => l.status === "new")).filter((l) => !l.comp);
@@ -1765,13 +1771,13 @@ function finishPay(sig) {
 function closeCheck(c) {
   const t = checkTotals(c); const totalTip = c.payments.reduce((n, x) => n + x.tip, 0); const comp = c.lines.filter((l) => l.comp).reduce((n, l) => n + lineTotal(l), 0);
   const kt = S.tickets.filter((k) => k.checkId === c.id && k.readyAt); const kitchenMins = kt.length ? Math.round(kt.reduce((n, k) => n + (k.readyAt - k.at), 0) / kt.length / 60000) : null;
-  const closed = { no: c.no, table: c.tableId ? tableName(tableOf(c.tableId)) : "Tab " + (c.tab.name || ""), tableId: c.tableId, guest: guestName(c.guestId), guestId: c.guestId, guests: c.guests, sale: t.sale, tax: t.tax, tip: totalTip, discount: t.disc, comp, method: [...new Set(c.payments.map((x) => x.method))].join(" + "), opened: c.opened, at: Date.now(), by: staffName(c.server), byId: c.server, lines: c.lines.map((l) => ({ name: l.name, qty: l.qty, price: l.price + l.mods.reduce((n, m) => n + m.price, 0), guest: l.guest, mods: l.mods.map((m) => m.name), itemId: l.itemId, cat: (itemOf(l.itemId) || {}).cat, comp: !!l.comp })), payments: c.payments, kitchenMins };
+  const closed = { no: c.no, table: c.tableId ? tableName(tableOf(c.tableId)) : c.quick ? "Quick sale" : "Tab " + (c.tab.name || ""), tableId: c.tableId, guest: guestName(c.guestId), guestId: c.guestId, guests: c.guests, sale: t.sale, tax: t.tax, tip: totalTip, discount: t.disc, comp, method: [...new Set(c.payments.map((x) => x.method))].join(" + "), opened: c.opened, at: Date.now(), by: staffName(c.server), byId: c.server, lines: c.lines.map((l) => ({ name: l.name, qty: l.qty, price: l.price + l.mods.reduce((n, m) => n + m.price, 0), guest: l.guest, mods: l.mods.map((m) => m.name), itemId: l.itemId, cat: (itemOf(l.itemId) || {}).cat, comp: !!l.comp })), payments: c.payments, kitchenMins };
   S.closed.push(closed);
   const g = guestOf(c.guestId); if (g) { g.visits++; g.spent += t.total + totalTip; g.last = dkey(); }
   if (c.tableId) S.recentClosed[c.tableId] = Date.now();
   for (const k of S.tickets) if (k.checkId === c.id && k.status !== "served") { if (k.status === "ready") { k.status = "served"; k.pickedUp = true; } else { k.status = "served"; k.pickedUp = true; k.readyAt = k.readyAt || Date.now(); } }
   audit("Closed check " + c.no, "", money(t.total + totalTip));
-  delete S.checks[c.id]; cur = null; save(); show("floor"); toast("Check " + closed.no + " closed - " + money(t.total + totalTip) + ". Table is free.");
+  delete S.checks[c.id]; cur = null; save(); show("floor"); toast(c.quick ? "Quick sale " + closed.no + " done - " + money(t.total + totalTip) : "Check " + closed.no + " closed - " + money(t.total + totalTip) + (c.tableId ? (VENUE === "bar" ? ". Stool is free." : ". Table is free.") : "."));
 }
 
 // ---------- hand it to the guest: tip, tap, sign, receipt ----------
