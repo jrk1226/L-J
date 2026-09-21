@@ -10,6 +10,16 @@ The earlier, simpler build is still at https://jrk1226.github.io/L-J/classic.htm
 
 Two independent systems in one app. The switch sits under the L&J logo: Restaurant (dining room, bar and patio, full menu, kitchen stations) or Bar (strictly a bar: sixteen stools, open tabs, and a drinks-only menu of about 130 drinks - on tap, bottles and cans, cocktails, shots, liquor by the pour, wine, soft drinks, every one with a picture; no kitchen, drinks are rung up and poured). Each keeps its own floor, menu, checks and day; switching never mixes them.
 
+## Bar workflow
+
+- **Quick sale** - a walk-up who pays now. Tap it, tap the drinks, "Ring up and pay", done. No stool, no tab.
+- **Same again** - on a stool's menu (hold the stool) or on the order screen: re-rings the last round in one tap.
+- **Happy hour** - set the days, hours, percent and which categories in Settings. Prices drop on their own and go back after; the tile shows the old price crossed out and the strip at the top says when it ends.
+- **Put it on another check** - More menu on any check: every drink moves to the stool or tab you pick and this check closes.
+- **Buy-back** - a comp reason for the regular's free round. The manager screen flags any bartender past the nightly limit (Settings).
+- **Last call** - closes every open check with a card on file to that card with the auto tip (Settings). Checks with no card stay open and are listed.
+- **Drawer** - starting bank, cash taken, cash drops, what should be in the drawer, count it, over or short. "Close the shift" prints the close-out slip with sales and card tips owed per bartender and starts the drawer fresh.
+
 ## Test PINs
 
 - Josh 1234 (owner)

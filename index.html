@@ -198,6 +198,21 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 .tbl.stool.sel{outline:none}
 .tbl.stool.mine::before{top:-2px;right:8px;width:10px;height:10px;box-shadow:0 0 0 2px var(--panel)}
 :root[data-big] .tbl.stool{min-width:78px;max-width:120px}:root[data-big] .tbl.stool .seat{width:82px;height:82px;font-size:32px}
+
+/* Bar workflow: happy hour strip, same again, drawer sheet */
+.btn.warn{background:var(--amber-soft);color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber)}
+.floortools .sp{flex:1}
+.hh{flex-basis:100%;background:linear-gradient(90deg,var(--amber-soft),transparent);color:var(--amber);font-weight:800;font-size:13px;padding:8px 12px;border-radius:10px;border-left:4px solid var(--amber)}
+#hhstrip{margin:0 0 10px;background:var(--amber-soft);color:var(--amber);font-weight:800;font-size:12.5px;padding:7px 12px;border-radius:10px}
+.guests button.again{background:var(--green-soft);color:var(--green);box-shadow:inset 0 0 0 1px var(--green);margin-left:auto}
+.item .p s{color:var(--muted);font-weight:600;margin-right:2px}
+.kv{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink2)}
+.kv b{color:var(--ink);font-size:15px}
+.kv.big{font-size:15px;border-bottom:0;padding-top:12px}
+.kv.big b{font-size:22px;color:var(--amber)}
+.kv b.good{color:var(--green)}.kv b.warn{color:var(--amber)}.kv b.bad{color:var(--red)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#drawersheet .card{max-width:560px}
 @media (max-width:820px){
   .floor{height:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:10px;background-image:none}
   .tbl:not(.stool){position:static!important;width:auto!important;height:auto!important;min-height:104px;border-radius:14px!important;text-align:left;align-items:flex-start}
@@ -547,6 +562,7 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
       </div>
       <div class="order">
         <div class="check">
+          <div id="hhstrip" hidden></div>
           <div class="guests" id="guests"></div>
           <div class="lines" id="lines"></div>
           <div class="totals" id="totals"></div>
@@ -757,6 +773,16 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
     <div class="field"><label>Card last four</label><input id="tbcard" inputmode="numeric" maxlength="4" placeholder="4242"></div>
     <div class="field"><label>Seat</label><div class="chips" id="tbseat"></div></div>
     <div class="row"><button class="btn quiet" data-close>Back</button><button class="btn primary" id="tbopen">Open tab</button></div>
+  </div>
+</div>
+
+<!-- DRAWER -->
+<div class="sheet" id="drawersheet" role="dialog" aria-modal="true">
+  <div class="card">
+    <h3>Cash drawer</h3>
+    <div class="sub">Starting bank plus cash taken, minus drops, is what should be in the drawer.</div>
+    <div id="drawerbody"></div>
+    <div class="row"><button class="btn quiet" data-close>Back</button><button class="btn" id="dwdrop">Drop cash</button><button class="btn primary" id="dwclose">Close the shift</button></div>
   </div>
 </div>
 
@@ -972,7 +998,7 @@ function seed() {
     { id: "P1", label: "Patio 1", seats: 4, zone: "Patio", x: 3, y: 12, w: 16, h: 76, shape: "sq" }, { id: "P2", label: "Patio 2", seats: 4, zone: "Patio", x: 23, y: 12, w: 16, h: 76, shape: "sq" }, { id: "P3", label: "Patio 3", seats: 6, zone: "Patio", x: 43, y: 12, w: 22, h: 76, shape: "sq" },
     { id: "TO", label: "Takeout", seats: 0, zone: "Patio", x: 80, y: 12, w: 17, h: 76, shape: "sq" },
   ];
-  const settings = { big: false, taxRate: 0.08875, tips: [18, 20, 22], bigVoid: 100, bigDiscount: 25 };
+  const settings = { big: false, taxRate: 0.08875, tips: [18, 20, 22], bigVoid: 100, bigDiscount: 25, happy: { on: VENUE === "bar", start: "16:00", end: "19:00", days: [1, 2, 3, 4, 5], pct: 20, cats: ["tap", "bottles", "liquor"] }, autoTip: 20, buybackMax: 4 };
   if (VENUE === "bar") {
     // The bar system: no kitchen, no tables. A bar, its stools, and drinks.
     stations.length = 0; stations.push({ id: "bar", name: "Bar" });
@@ -1080,11 +1106,44 @@ function seed() {
   ];
   if (VENUE === "bar") tickets.length = 0;
   const favs = { s4: { i1: 40, i6: 22, i7: 18, i11: 31, i3: 15 }, s2: { i26: 20, i21: 14, i12: 12, i29: 9, i1: 8 }, s3: { i26: 12, i25: 10, i7: 9, i2: 8 } };
-  return { v: 4, menuV: MENU_V, stations, cats, modGroups, items, staff, guests, tables, checks, tickets, closed, voids: [], audit: [], favs, settings, giftCards, nextNo: no, nextGuest: 6, nextTicket: 5, recentClosed: {} };
+  return { v: 4, menuV: MENU_V, stations, cats, modGroups, items, staff, guests, tables, checks, tickets, closed, voids: [], audit: [], favs, settings, giftCards, nextNo: no, nextGuest: 6, nextTicket: 5, recentClosed: {}, drawer: { bank: 200, drops: [], openedAt: Date.now() }, shifts: [] };
 }
 const MENU_V = 2; // bump when the built-in menu grows; saved days pick up the new drinks without losing anything
 let S = load();
-function load() { try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 4) return refreshMenu(s); } } catch (e) {} return seed(); }
+function load() { try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 4) return withDefaults(refreshMenu(s)); } } catch (e) {} return withDefaults(seed()); }
+// Older saved days get the newer settings filled in, nothing else touched.
+function withDefaults(s) {
+  s.settings = s.settings || {}; if (!s.settings.happy) s.settings.happy = { on: VENUE === "bar", start: "16:00", end: "19:00", days: [1, 2, 3, 4, 5], pct: 20, cats: ["tap", "bottles", "liquor"] };
+  if (s.settings.autoTip == null) s.settings.autoTip = 20; if (s.settings.buybackMax == null) s.settings.buybackMax = 4;
+  if (!s.drawer) s.drawer = { bank: 200, drops: [], openedAt: Date.now() }; if (!s.shifts) s.shifts = [];
+  for (const c of s.closed || []) if (c.cash == null) { c.cash = c.method === "Cash" ? c.sale + c.tax - (c.discount || 0) + c.tip : 0; c.cardTip = c.method === "Cash" ? 0 : c.tip; }
+  return s;
+}
+// Happy hour: on the days and hours set in Settings, the picked categories ring in cheaper on their own.
+function happyNow() { const h = S.settings.happy; if (!h || !h.on) return false; const d = new Date(); if (!h.days.includes(d.getDay())) return false; const t = pad2(d.getHours()) + ":" + pad2(d.getMinutes()); return t >= h.start && t < h.end; }
+function happyApplies(it) { const h = S.settings.happy; return happyNow() && it && (!h.cats.length || h.cats.includes(it.cat)); }
+function happyPrice(it) { return happyApplies(it) ? Math.round(it.price * (1 - S.settings.happy.pct / 100) * 100) / 100 : it.price; }
+function happyLabel() { const h = S.settings.happy; const [hh, mm] = h.end.split(":").map(Number); return "Happy hour until " + (hh % 12 || 12) + ":" + pad2(mm) + (hh < 12 ? " am" : " pm") + " - " + h.pct + "% off " + (h.cats.length ? h.cats.map((c) => (catOf(c) || { name: c }).name.toLowerCase()).join(", ") : "everything"); }
+// The last round on a check: the drinks that were rung up together most recently.
+function lastRound(c) { const sent = c.lines.filter((l) => l.status === "sent" && !l.comp && l.sentAt); if (!sent.length) return []; const last = Math.max(...sent.map((l) => l.sentAt)); return sent.filter((l) => last - l.sentAt < 60000); }
+function sameAgain(cid, ringNow) {
+  const c = S.checks[cid]; if (!c) return; const round = lastRound(c); if (!round.length) return toast("Nothing rung up yet on this check");
+  snap(); const fresh = round.map((l) => { const it = itemOf(l.itemId); return { id: uid(), itemId: l.itemId, name: l.name, price: it ? happyPrice(it) : l.price, hh: it ? happyApplies(it) : false, qty: l.qty, guest: l.guest, mods: l.mods.map((m) => Object.assign({}, m)), note: l.note, status: "new", kstatus: "", sentAt: null, comp: null, paid: false, by: me ? me.name : "" }; });
+  c.lines.push(...fresh); c.touched = Date.now(); audit("Same again on check " + c.no, "", fresh.length + " lines");
+  if (ringNow) { const keep = cur; cur = cid; sendNow(fresh); cur = keep; save(); if (view === "floor") drawFloor(); toast("Same again for " + checkLabel(c) + " - rung up", true); }
+  else { save(); drawOrder(); toast("Same again - " + fresh.length + (fresh.length === 1 ? " line" : " lines") + " added", true); }
+}
+// Last call: every open tab with a card on file gets closed to that card with the house auto tip.
+async function lastCall() {
+  const all = Object.values(S.checks).filter((c) => c.lines.length && remaining(c) > 0.004);
+  const card = all.filter((c) => (c.tab && c.tab.card) || (c.tabInfo && c.tabInfo.card)); const noCard = all.filter((c) => !card.includes(c));
+  if (!all.length) return toast("Nothing open to close");
+  const v = await pick("Last call", card.length + (card.length === 1 ? " check has" : " checks have") + " a card on file and will be charged with a " + S.settings.autoTip + "% tip. " + (noCard.length ? noCard.length + " without a card stay open: " + noCard.map(checkLabel).join(", ") + "." : ""), [{ label: "Close " + card.length + " to the cards on file", value: "go" }, { label: "Not yet", value: "" }]);
+  if (v !== "go") return;
+  let total = 0; for (const c of card) { const left = remaining(c); const tip = Math.round(checkTotals(c).sale * S.settings.autoTip) / 100; c.payments.push({ part: ensureParts(c).list[0].id, amount: left, tip, method: "Card", at: Date.now(), by: me ? me.name : "", rcpt: "none", auto: true }); total += left + tip; audit("Last call charge on check " + c.no, "", money(left + tip) + " card " + ((c.tab || c.tabInfo || {}).card || "")); closeCheck(c, true); }
+  save(); drawFloor(); toast("Last call: " + card.length + " closed, " + money(total) + " to cards on file" + (noCard.length ? ". " + noCard.length + " still open." : "."));
+}
+
 // Folds new built-in menu items, pictures, categories and choice groups into a saved day. Never touches checks, staff, or anything a manager edited.
 function refreshMenu(s) {
   if (s.menuV === MENU_V) return s;
@@ -1262,8 +1321,8 @@ let mineOnly = false;
 function drawFloor() {
   $("#legend").innerHTML = Object.entries(STATES).filter(([k]) => VENUE !== "bar" || (k !== "sent" && k !== "ready")).map(([k, v]) => "<span><i style='background:" + stateColor(k) + "'></i>" + v + "</span>").join("");
   const openN = Object.values(S.checks).length; const tabsN = Object.values(S.checks).filter((c) => !c.tableId).length;
-  $("#floortools").innerHTML = (VENUE === "bar" ? "<button class='btn sm primary' id='quickBtn'>Quick sale</button>" : "") + "<button class='btn sm" + (mineOnly ? " on" : "") + "' id='mineBtn'>" + (VENUE === "bar" ? "My stools" : "My tables") + "</button><button class='btn sm' id='openBtn'>Open checks: " + openN + "</button>" + (tabsN ? "<button class='btn sm' id='tabsBtn'>Bar tabs: " + tabsN + "</button>" : "") + (can("transfer") ? "<button class='btn sm' id='moveBtn'>" + (VENUE === "bar" ? "Move a stool" : "Move a table") + "</button>" : "");
-  $("#mineBtn").onclick = () => { mineOnly = !mineOnly; drawFloor(); }; const qb = $("#quickBtn"); if (qb) qb.onclick = quickSale;
+  $("#floortools").innerHTML = (VENUE === "bar" ? "<button class='btn sm primary' id='quickBtn'>Quick sale</button>" : "") + "<button class='btn sm" + (mineOnly ? " on" : "") + "' id='mineBtn'>" + (VENUE === "bar" ? "My stools" : "My tables") + "</button><button class='btn sm' id='openBtn'>Open checks: " + openN + "</button>" + (tabsN ? "<button class='btn sm' id='tabsBtn'>Bar tabs: " + tabsN + "</button>" : "") + (can("transfer") ? "<button class='btn sm' id='moveBtn'>" + (VENUE === "bar" ? "Move a stool" : "Move a table") + "</button>" : "") + (VENUE === "bar" ? "<span class='sp'></span><button class='btn sm' id='drawerBtn'>Drawer</button><button class='btn sm warn' id='lastCallBtn'>Last call</button>" : "") + (happyNow() ? "<div class='hh'>" + esc(happyLabel()) + "</div>" : "");
+  $("#mineBtn").onclick = () => { mineOnly = !mineOnly; drawFloor(); }; const qb = $("#quickBtn"); if (qb) qb.onclick = quickSale; const lb = $("#lastCallBtn"); if (lb) lb.onclick = lastCall; const db = $("#drawerBtn"); if (db) db.onclick = drawerSheet;
   $("#openBtn").onclick = openChecksSheet; const tb = $("#tabsBtn"); if (tb) tb.onclick = () => show("tabs"); const mb = $("#moveBtn"); if (mb) mb.onclick = () => moveTableFlow(null);
   drawReady();
   const W = $("#floorwrap"); W.innerHTML = "";
@@ -1324,9 +1383,10 @@ function openTable(tid) {
 async function tableMenu(tid) {
   const c = checkOfTable(tid); const t = tableOf(tid);
   const opts = [{ label: "Open " + (c ? "the check" : "a check"), value: "open" }];
-  if (c) { opts.push({ label: "Move to another table", value: "move" }); opts.push({ label: "Hand to another server", value: "server" }); opts.push({ label: "Print the check", value: "print" }); }
+  if (c && VENUE === "bar" && lastRound(c).length) opts.push({ label: "Same again", sub: lastRound(c).map((l) => l.qty + " x " + l.name).join(", "), value: "again" });
+  if (c) { opts.push({ label: VENUE === "bar" ? "Move to another stool" : "Move to another table", value: "move" }); opts.push({ label: VENUE === "bar" ? "Hand to another bartender" : "Hand to another server", value: "server" }); opts.push({ label: "Print the check", value: "print" }); }
   const v = await pick(tableName(t), c ? checkLabel(c) + " - " + staffName(c.server) : "Nothing open here", opts);
-  if (v === "open") openTable(tid); if (v === "move") moveTableFlow(c.id); if (v === "server") handToServer(c.id); if (v === "print") printCheck(c);
+  if (v === "open") openTable(tid); if (v === "again") sameAgain(c.id, true); if (v === "move") moveTableFlow(c.id); if (v === "server") handToServer(c.id); if (v === "print") printCheck(c);
 }
 async function openChecksSheet() {
   const cs = Object.values(S.checks).sort((a, b) => a.opened - b.opened);
@@ -1391,6 +1451,8 @@ function drawGuestsBar() {
     G.appendChild(b);
   }
   const add = document.createElement("button"); add.textContent = "+ Guest"; add.onclick = () => { c.guests++; curGuest = c.guests; save(); drawOrder(); }; G.appendChild(add);
+  if (VENUE === "bar" && lastRound(c).length) { const ag = document.createElement("button"); ag.className = "again"; ag.innerHTML = "Same again<small>" + esc(lastRound(c).map((l) => l.qty + " x " + l.name).join(", ").slice(0, 40)) + "</small>"; ag.onclick = () => sameAgain(c.id, false); G.appendChild(ag); }
+  const hh = $("#hhstrip"); if (hh) hh.hidden = !happyNow(); if (hh && happyNow()) hh.textContent = happyLabel();
 }
 function badgeFor(l) {
   if (l.comp) return "<span class='badge comp'>comp</span>";
@@ -1443,7 +1505,7 @@ function drawMenu() {
   if (!list.length) m.innerHTML = "<div class='empty' style='grid-column:1/-1'>" + (mq ? "Nothing on the menu matches that." : cat === "fav" ? "Favorites fill in on their own as you ring things up." : "Nothing here yet.") + "</div>";
   for (const it of list) {
     const b = document.createElement("button"); b.className = "item" + (it.img ? " pic" : "") + (it.out ? " out" : "");
-    b.innerHTML = (it.img ? "<span class='art'><img src='" + esc(it.img) + "' alt='' loading='lazy'" + (it.photo ? " class='cover'" : "") + " onerror='this.remove()'></span>" : "") + "<b>" + esc(it.name) + "</b><span class='p mono'>" + money(it.price) + "<span class='hold" + (it.mods.length ? " ask" : "") + "'>" + (it.mods.length ? "Choices" : "One tap") + "</span></span>";
+    b.innerHTML = (it.img ? "<span class='art'><img src='" + esc(it.img) + "' alt='' loading='lazy'" + (it.photo ? " class='cover'" : "") + " onerror='this.remove()'></span>" : "") + "<b>" + esc(it.name) + "</b><span class='p mono'>" + (happyApplies(it) ? "<s>" + money(it.price) + "</s> " + money(happyPrice(it)) : money(it.price)) + "<span class='hold" + (it.mods.length ? " ask" : "") + "'>" + (it.mods.length ? "Choices" : "One tap") + "</span></span>";
     longPress(b, () => tapItem(it), () => itemHoldMenu(it)); m.appendChild(b);
   }
 }
@@ -1464,8 +1526,8 @@ function addLine(it, mods, note, qty) {
   const c = curCheck(); if (!c) return;
   snap();
   const key = JSON.stringify(mods);
-  const ex = c.lines.find((l) => l.itemId === it.id && l.status === "new" && l.guest === curGuest && JSON.stringify(l.mods) === key && l.note === note && !l.comp);
-  if (ex) ex.qty += qty; else c.lines.push({ id: uid(), itemId: it.id, name: it.name, price: it.price, qty, guest: curGuest, mods, note, status: "new", kstatus: "", sentAt: null, comp: null, paid: false, by: me ? me.name : "" });
+  const ex = c.lines.find((l) => l.itemId === it.id && l.status === "new" && l.guest === curGuest && JSON.stringify(l.mods) === key && l.note === note && !l.comp && l.price === happyPrice(it));
+  if (ex) ex.qty += qty; else c.lines.push({ id: uid(), itemId: it.id, name: it.name, price: happyPrice(it), hh: happyApplies(it), qty, guest: curGuest, mods, note, status: "new", kstatus: "", sentAt: null, comp: null, paid: false, by: me ? me.name : "" });
   c.touched = Date.now();
   if (me) { S.favs[me.id] = S.favs[me.id] || {}; S.favs[me.id][it.id] = (S.favs[me.id][it.id] || 0) + qty; }
   save(); drawOrder(); toast((qty > 1 ? qty + " x " : "") + it.name + " on guest " + curGuest, true);
@@ -1554,8 +1616,20 @@ async function moveLineToTable(l) {
   snap(); c.lines = c.lines.filter((x) => x.id !== l.id); l.guest = 1; dest.lines.push(l); dest.touched = Date.now(); audit("Moved item to another check", checkLabel(c), checkLabel(dest), l.name); save(); drawOrder(); toast(l.name + " moved to " + checkLabel(dest), true);
 }
 
+// Put the whole check on another one: "it's on his tab".
+async function mergeCheck(c) {
+  if (c.payments.length) return toast("Something is already paid on this check - move lines one at a time instead");
+  if (!c.lines.length) return toast("Nothing on this check yet");
+  const others = Object.values(S.checks).filter((x) => x.id !== c.id);
+  if (!others.length) return toast("No other open check to put it on");
+  const v = await pick("Put " + checkLabel(c) + " on", money(checkTotals(c).total) + " moves over. This check closes.", others.map((x) => ({ label: checkLabel(x), sub: staffName(x.server) + " - " + money(checkTotals(x).total) + " so far", value: x.id }))); if (!v) return;
+  const dest = S.checks[v]; snap(); const top = Math.max(1, ...dest.lines.map((l) => l.guest)); const nextGuest = dest.guests + 1;
+  for (const l of c.lines) { l.guest = nextGuest; dest.lines.push(l); } dest.guests = nextGuest; dest.touched = Date.now();
+  audit("Merged check " + c.no + " into " + dest.no, checkLabel(c), checkLabel(dest), c.lines.length + " lines");
+  if (c.tableId) S.recentClosed[c.tableId] = Date.now(); delete S.checks[c.id]; cur = dest.id; curGuest = nextGuest; save(); show("order"); toast("Moved onto " + checkLabel(dest) + " as guest " + nextGuest, true);
+}
 // ---------- reasons: void, comp, refund ----------
-const REASONS = { void: ["Wrong item rung in", "Guest changed their mind", "Kitchen mistake", "Took too long", "Walked out", "Other"], comp: ["Manager comp", "Birthday", "Long wait", "Kitchen mistake", "Regular", "Other"], refund: ["Charged twice", "Guest unhappy", "Wrong amount", "Other"], discount: ["Employee meal", "Regular", "Happy hour", "Manager", "Other"] };
+const REASONS = { void: ["Wrong item rung in", "Guest changed their mind", "Kitchen mistake", "Took too long", "Walked out", "Other"], comp: ["Buy-back", "Manager comp", "Birthday", "Long wait", "Kitchen mistake", "Regular", "Other"], refund: ["Charged twice", "Guest unhappy", "Wrong amount", "Other"], discount: ["Employee meal", "Regular", "Happy hour", "Manager", "Other"] };
 let why = null;
 function whySheet(kind, target, approver) {
   why = { kind, target, approver, pick: REASONS[kind][0] };
@@ -1602,6 +1676,7 @@ $("#moreBtn").onclick = () => {
     { k: "guests", t: "Guest count", s: c.guests + " now" }, { k: "attach", t: "Guest profile", s: c.guestId ? guestName(c.guestId) : "Put a regular on it" }, { k: "allergy", t: "Allergy", s: c.allergy || "None noted" },
     { k: "request", t: c.requested ? "Un-request check" : "Check requested", s: "Guest is getting ready to pay" }, { k: "discount", t: "Discount", s: c.discount ? c.discount.pct + "% off" : "Percent off, with a reason" },
     { k: "move", t: "Move table", s: "Different table" }, { k: "server", t: "Hand to server", s: "Different server" }, { k: "print", t: "Print check", s: "With tip lines" },
+    { k: "merge", t: "Put it on another check", s: "Every line moves to a stool or tab you pick" },
     { k: "voidall", t: "Void the check", s: "Everything, with a reason", danger: true },
   ];
   $("#moreacts").innerHTML = acts.map((a) => "<button class='btn " + (a.danger ? "danger" : "") + "' data-k='" + a.k + "'>" + a.t + "<small>" + esc(a.s) + "</small></button>").join("");
@@ -1615,6 +1690,7 @@ $("#moreacts").onclick = async (e) => {
   if (k === "request") { c.requested = !c.requested; save(); drawOrder(); toast(c.requested ? "Marked: check requested" : "Un-requested"); }
   if (k === "discount") { const who = await needManager("discount", "A discount needs a manager"); if (!who) return; whySheet("discount", c, who); }
   if (k === "move") moveTableFlow(c.id);
+  if (k === "merge") mergeCheck(c);
   if (k === "server") handToServer(c.id);
   if (k === "print") printCheck(c);
   if (k === "voidall") { const who = await needManager(c.lines.some((l) => l.status === "sent") ? "voidSent" : "transfer", "Voiding a check with sent items needs a manager"); if (!who) return; const r = await pick("Why void the whole check?", "Nothing is charged and the table frees up.", REASONS.void.map((x) => ({ label: x, value: x }))); if (!r) return; snap(); const s = sums(c.lines); S.voids.push({ at: Date.now(), kind: "void", where: checkLabel(c), what: "Whole check " + c.no + " (" + c.lines.length + " lines)", amount: s.sale, why: r, by: me.name, ok: who.name }); audit("Voided check " + c.no, money(s.sale), "0", r); S.tickets = S.tickets.filter((k) => k.checkId !== c.id); delete S.checks[c.id]; cur = null; save(); show("floor"); toast("Check voided"); if (s.sale >= S.settings.bigVoid) managerAlert("Big void: whole check " + money(s.sale) + " by " + me.name); }
@@ -1768,16 +1844,17 @@ function finishPay(sig) {
   if (remaining(c) > 0.004 && !allParts) { save(); drawOrder(); toast(money(pay.amt + tip) + " taken - " + money(remaining(c)) + " still owed"); if (parts.list.length > 1) setTimeout(openParts, 400); return; }
   closeCheck(c);
 }
-function closeCheck(c) {
+function closeCheck(c, quiet) {
   const t = checkTotals(c); const totalTip = c.payments.reduce((n, x) => n + x.tip, 0); const comp = c.lines.filter((l) => l.comp).reduce((n, l) => n + lineTotal(l), 0);
   const kt = S.tickets.filter((k) => k.checkId === c.id && k.readyAt); const kitchenMins = kt.length ? Math.round(kt.reduce((n, k) => n + (k.readyAt - k.at), 0) / kt.length / 60000) : null;
   const closed = { no: c.no, table: c.tableId ? tableName(tableOf(c.tableId)) : c.quick ? "Quick sale" : "Tab " + (c.tab.name || ""), tableId: c.tableId, guest: guestName(c.guestId), guestId: c.guestId, guests: c.guests, sale: t.sale, tax: t.tax, tip: totalTip, discount: t.disc, comp, method: [...new Set(c.payments.map((x) => x.method))].join(" + "), opened: c.opened, at: Date.now(), by: staffName(c.server), byId: c.server, lines: c.lines.map((l) => ({ name: l.name, qty: l.qty, price: l.price + l.mods.reduce((n, m) => n + m.price, 0), guest: l.guest, mods: l.mods.map((m) => m.name), itemId: l.itemId, cat: (itemOf(l.itemId) || {}).cat, comp: !!l.comp })), payments: c.payments, kitchenMins };
+  closed.cash = c.payments.filter((p) => p.method === "Cash").reduce((n, p) => n + p.amount + p.tip, 0); closed.cardTip = c.payments.filter((p) => p.method !== "Cash").reduce((n, p) => n + p.tip, 0); closed.buybacks = c.lines.filter((l) => l.comp && l.comp.why === "Buy-back").length;
   S.closed.push(closed);
   const g = guestOf(c.guestId); if (g) { g.visits++; g.spent += t.total + totalTip; g.last = dkey(); }
   if (c.tableId) S.recentClosed[c.tableId] = Date.now();
   for (const k of S.tickets) if (k.checkId === c.id && k.status !== "served") { if (k.status === "ready") { k.status = "served"; k.pickedUp = true; } else { k.status = "served"; k.pickedUp = true; k.readyAt = k.readyAt || Date.now(); } }
   audit("Closed check " + c.no, "", money(t.total + totalTip));
-  delete S.checks[c.id]; cur = null; save(); show("floor"); toast(c.quick ? "Quick sale " + closed.no + " done - " + money(t.total + totalTip) : "Check " + closed.no + " closed - " + money(t.total + totalTip) + (c.tableId ? (VENUE === "bar" ? ". Stool is free." : ". Table is free.") : "."));
+  delete S.checks[c.id]; if (quiet) { if (cur === c.id) cur = null; return; } cur = null; save(); show("floor"); toast(c.quick ? "Quick sale " + closed.no + " done - " + money(t.total + totalTip) : "Check " + closed.no + " closed - " + money(t.total + totalTip) + (c.tableId ? (VENUE === "bar" ? ". Stool is free." : ". Table is free.") : "."));
 }
 
 // ---------- hand it to the guest: tip, tap, sign, receipt ----------
@@ -1842,6 +1919,45 @@ $("#tbopen").onclick = () => {
   if (seat) c.tabInfo = { name, phone, card };
   const g = S.guests.find((x) => phone && x.phone.replace(/\D/g, "") === phone.replace(/\D/g, "")); if (g) c.guestId = g.id;
   S.checks[c.id] = c; audit("Opened tab " + c.no, "", name || card || phone); save(); closeSheet("tabsheet"); cur = c.id; curGuest = 1; show("order"); toast("Tab open" + (g ? " - " + g.name + " is on it" : ""));
+};
+
+// ============================================================
+//  CASH DRAWER AND SHIFT CLOSE-OUT (bar)
+// ============================================================
+function drawerNumbers() {
+  const today = onDay(dkey()); const D = S.drawer; const cashSales = today.reduce((n, c) => n + (c.cash || 0), 0); const drops = D.drops.reduce((n, d) => n + d.amount, 0);
+  return { cashSales, drops, expected: D.bank + cashSales - drops, today };
+}
+function drawerSheet() {
+  const { cashSales, drops, expected, today } = drawerNumbers(); const D = S.drawer;
+  const by = {}; for (const c of today) { const k = c.by || "unknown"; by[k] = by[k] || { sales: 0, cardTip: 0, cash: 0, n: 0, bb: 0 }; by[k].sales += c.sale - c.discount; by[k].cardTip += c.cardTip || 0; by[k].cash += c.cash || 0; by[k].n++; by[k].bb += c.buybacks || 0; }
+  $("#drawerbody").innerHTML =
+    "<div class='field'><label>Starting bank</label><input id='dwbank' inputmode='decimal' value='" + D.bank + "'" + (D.drops.length ? " disabled" : "") + "></div>" +
+    "<div class='kv'><span>Cash taken today</span><b class='mono'>" + money(cashSales) + "</b></div>" +
+    "<div class='kv'><span>Cash drops (" + D.drops.length + ")</span><b class='mono'>" + money(drops) + "</b></div>" +
+    (D.drops.length ? "<div class='sub'>" + D.drops.map((d) => hm(d.at) + " - " + money(d.amount) + " by " + esc(d.by)).join("<br>") + "</div>" : "") +
+    "<div class='kv big'><span>Should be in the drawer</span><b class='mono'>" + money(expected) + "</b></div>" +
+    "<div class='field'><label>Counted (what is actually in the drawer)</label><input id='dwcount' inputmode='decimal' placeholder='0.00' value='" + (D.counted != null ? D.counted : "") + "'></div>" +
+    "<div class='kv' id='dwdiff'></div>" +
+    "<h3 class='sec'>Tonight, by bartender</h3>" + (Object.keys(by).length ? "<div class='tblwrap'><table class='tbl2'><thead><tr><th>Who</th><th class='r'>Checks</th><th class='r'>Sales</th><th class='r'>Card tips owed</th><th class='r'>Buy-backs</th></tr></thead><tbody>" + Object.entries(by).map(([k, v]) => "<tr><td><b>" + esc(k) + "</b></td><td class='r mono'>" + v.n + "</td><td class='r mono'>" + money(v.sales) + "</td><td class='r mono'>" + money(v.cardTip) + "</td><td class='r mono'>" + v.bb + "</td></tr>").join("") + "</tbody></table></div>" : "<div class='empty'>Nothing closed yet today.</div>") +
+    (S.shifts.length ? "<h3 class='sec'>Last close-out</h3><div class='sub'>" + esc(new Date(S.shifts[S.shifts.length - 1].at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })) + " by " + esc(S.shifts[S.shifts.length - 1].by) + " - counted " + money(S.shifts[S.shifts.length - 1].counted) + ", " + (Math.abs(S.shifts[S.shifts.length - 1].overShort) < 0.005 ? "spot on" : (S.shifts[S.shifts.length - 1].overShort > 0 ? "over " : "short ") + money(Math.abs(S.shifts[S.shifts.length - 1].overShort))) + "</div>" : "");
+  const diff = () => { const n = Number($("#dwcount").value); const el = $("#dwdiff"); if (!$("#dwcount").value) { el.innerHTML = ""; return; } const d = Math.round((n - expected) * 100) / 100; el.innerHTML = "<span>" + (Math.abs(d) < 0.005 ? "Spot on" : d > 0 ? "Over" : "Short") + "</span><b class='mono " + (Math.abs(d) < 0.005 ? "good" : d > 0 ? "warn" : "bad") + "'>" + (Math.abs(d) < 0.005 ? "" : money(Math.abs(d))) + "</b>"; };
+  $("#dwcount").oninput = diff; diff();
+  $("#dwbank").onchange = () => { const n = Number($("#dwbank").value); if (!isNaN(n) && n >= 0) { audit("Starting bank set", money(D.bank), money(n)); D.bank = n; save(); drawerSheet(); } };
+  openSheet("drawersheet");
+}
+$("#dwdrop").onclick = async () => { const v = await ask("Cash drop", "How much is going to the safe?", ""); const n = Number(v); if (!v || isNaN(n) || n <= 0) return; S.drawer.drops.push({ at: Date.now(), amount: n, by: me ? me.name : "" }); audit("Cash drop", "", money(n)); save(); drawerSheet(); toast(money(n) + " dropped"); };
+$("#dwclose").onclick = async () => {
+  const open = Object.values(S.checks).filter((c) => c.lines.length).length; if (open) return toast(open + " check" + (open === 1 ? " is" : "s are") + " still open - close them or run Last call first");
+  const counted = Number($("#dwcount").value); if (!$("#dwcount").value || isNaN(counted)) return toast("Count the drawer first");
+  const { cashSales, drops, expected, today } = drawerNumbers(); const overShort = Math.round((counted - expected) * 100) / 100;
+  const v = await pick("Close the shift?", "Counted " + money(counted) + ", should be " + money(expected) + " - " + (Math.abs(overShort) < 0.005 ? "spot on." : (overShort > 0 ? "over " : "short ") + money(Math.abs(overShort)) + "."), [{ label: "Close the shift and print the slip", value: "go" }, { label: "Not yet", value: "" }]); if (v !== "go") return;
+  const by = {}; for (const c of today) { const k = c.by || "unknown"; by[k] = by[k] || { sales: 0, cardTip: 0, n: 0 }; by[k].sales += c.sale - c.discount; by[k].cardTip += c.cardTip || 0; by[k].n++; }
+  const shift = { at: Date.now(), by: me ? me.name : "", bank: S.drawer.bank, cashSales, drops, expected, counted, overShort, checks: today.length, sales: today.reduce((n, c) => n + c.sale - c.discount, 0), tips: today.reduce((n, c) => n + c.tip, 0), by_staff: by };
+  S.shifts.push(shift); audit("Shift closed", "", money(counted) + " counted, " + (overShort >= 0 ? "over " : "short ") + money(Math.abs(overShort)));
+  S.drawer = { bank: S.drawer.bank, drops: [], openedAt: Date.now(), counted: null }; save(); closeSheet("drawersheet");
+  printHTML(receiptHead("Shift close-out", new Date(shift.at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) + " - " + shift.by) + "<div class='l'><span>Checks</span><span>" + shift.checks + "</span></div><div class='l'><span>Sales</span><span>" + money(shift.sales) + "</span></div><div class='l'><span>Tips</span><span>" + money(shift.tips) + "</span></div><hr><div class='l'><span>Starting bank</span><span>" + money(shift.bank) + "</span></div><div class='l'><span>Cash taken</span><span>" + money(shift.cashSales) + "</span></div><div class='l'><span>Cash drops</span><span>-" + money(shift.drops) + "</span></div><div class='l'><span>Should be</span><span>" + money(shift.expected) + "</span></div><div class='l'><span>Counted</span><span>" + money(shift.counted) + "</span></div><div class='l'><b>" + (Math.abs(shift.overShort) < 0.005 ? "Spot on" : shift.overShort > 0 ? "Over" : "Short") + "</b><b>" + money(Math.abs(shift.overShort)) + "</b></div><hr>" + Object.entries(by).map(([k, v]) => "<div class='l'><span>" + esc(k) + " - " + v.n + " checks</span><span>" + money(v.sales) + " / tips " + money(v.cardTip) + "</span></div>").join(""));
+  toast("Shift closed. Drawer starts fresh with a " + money(shift.bank) + " bank.");
 };
 </script>
 <script>
@@ -1944,6 +2060,8 @@ function alertsNow() {
   for (const a of (S.alerts || []).filter((x) => dkey(x.at) === dkey())) out.push({ msg: a.msg, at: a.at });
   const vt = S.voids.filter((v) => dkey(v.at) === dkey()); const byWho = {}; for (const v of vt) byWho[v.by] = (byWho[v.by] || 0) + 1; for (const [w, n] of Object.entries(byWho)) if (n >= 3) out.push({ msg: w + " has " + n + " voids today", soft: true });
   const comps = vt.filter((v) => v.kind === "comp").reduce((n, v) => n + v.amount, 0); if (comps >= 100) out.push({ msg: "Comps today are " + money(comps), soft: true });
+  const bb = {}; for (const v of vt) if (v.kind === "comp" && v.why === "Buy-back") bb[v.by] = (bb[v.by] || 0) + 1; for (const [w, n] of Object.entries(bb)) if (n > (S.settings.buybackMax || 4)) out.push({ msg: w + " has given " + n + " buy-backs tonight (limit " + (S.settings.buybackMax || 4) + ")" });
+  if (S.drawer && S.drawer.counted == null && today.length && new Date().getHours() < 6) out.push({ msg: "Drawer has not been closed out", soft: true });
   for (const k of S.tickets.filter((k) => (k.status === "new" || k.status === "cooking") && mins(k.at) >= 20)) out.push({ msg: k.table + " " + stationOf(k.station).name.toLowerCase() + " ticket has been on the line " + mins(k.at) + " min", soft: true });
   for (const c of Object.values(S.checks)) if (mins(c.opened) >= 150) out.push({ msg: checkLabel(c) + " has been open " + Math.round(mins(c.opened) / 60 * 10) / 10 + " hours (" + staffName(c.server) + ")", soft: true });
   return out;
@@ -2021,7 +2139,17 @@ function drawSettings() {
       "<div class='field'><label>Tip buttons (percent, comma separated)</label><input id='tipbtns' value='" + S.settings.tips.join(", ") + "'></div>" +
       "<div class='field'><label>Manager alert when a void is over (dollars)</label><input id='bigvoid' inputmode='decimal' value='" + S.settings.bigVoid + "'></div>" +
       "<div class='field'><label>Manager alert when a discount is over (percent)</label><input id='bigdisc' inputmode='decimal' value='" + S.settings.bigDiscount + "'></div>" +
+      "<div class='field'><label>Last call auto tip (percent)</label><input id='autotip' inputmode='decimal' value='" + S.settings.autoTip + "'></div>" +
+      "<div class='field'><label>Buy-backs per bartender before the manager hears about it</label><input id='bbmax' inputmode='numeric' value='" + S.settings.buybackMax + "'></div>" +
       "<div class='row'><button class='btn primary' id='savescreen'>Save</button></div></div>" +
+      "<div class='panelbox'><h3 class='sec' style='margin-top:0'>Happy hour</h3>" +
+      "<div class='switch'><div><b>Happy hour on</b><small>Prices drop on their own during these hours and go back after</small></div><button class='tog" + (S.settings.happy.on ? " on" : "") + "' id='hhtog'></button></div>" +
+      "<div class='two'><div class='field'><label>Starts</label><input id='hhstart' type='time' value='" + S.settings.happy.start + "'></div><div class='field'><label>Ends</label><input id='hhend' type='time' value='" + S.settings.happy.end + "'></div></div>" +
+      "<div class='field'><label>Percent off</label><input id='hhpct' inputmode='decimal' value='" + S.settings.happy.pct + "'></div>" +
+      "<div class='field'><label>Days</label><div class='chips' id='hhdays'>" + ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d, i) => "<button data-d='" + i + "' class='" + (S.settings.happy.days.includes(i) ? "on" : "") + "'>" + d + "</button>").join("") + "</div></div>" +
+      "<div class='field'><label>What is on happy hour (none picked means everything)</label><div class='chips' id='hhcats'>" + S.cats.map((c) => "<button data-c='" + c.id + "' class='" + (S.settings.happy.cats.includes(c.id) ? "on" : "") + "'>" + esc(c.name) + "</button>").join("") + "</div></div>" +
+      "<div class='sub'>" + (happyNow() ? "On right now: " + esc(happyLabel()) : "Not on right now.") + "</div>" +
+      "<div class='row'><button class='btn primary' id='savehh'>Save happy hour</button></div></div>" +
     "<div class='panelbox'><h3 class='sec' style='margin-top:0'>Gift cards</h3><div class='list'>" + Object.entries(S.giftCards).map(([k, v]) => "<div class='rowitem'><b>" + esc(k) + "</b><span class='amt mono'>" + money(v) + "</span></div>").join("") + "</div><div class='row'><button class='btn' id='addgift'>Sell a gift card</button></div></div>" +
     "<div class='panelbox'><h3 class='sec' style='margin-top:0'>Hardware and offline</h3><p class='sub' style='margin:0'>Runs in any browser and keeps working with no internet: orders, tickets, tabs and payments all carry on, and the whole app is saved on the device so it opens even when the connection is down. Printing uses the browser's print box, so a receipt printer set up on the tablet works as is. The card reader is pretend until a real processor is connected. Sharing between tablets (a phone at the table and a screen in the kitchen) is the next step and needs the shared database.</p></div>" +
     "<div class='panelbox'><h3 class='sec' style='margin-top:0'>Start over</h3><div class='row'><button class='btn danger' id='reset'>Reset to the sample data</button></div></div>";
@@ -2029,7 +2157,10 @@ function drawSettings() {
   $("#additem").onclick = () => editItem(null); $("#addmg").onclick = () => modSheet(null); $("#addcat").onclick = () => catSheet(null); $("#addstaff").onclick = () => staffSheet(null);
   $("#bigtog").onclick = () => { S.settings.big = !S.settings.big; save(); applyBig(); drawSettings(); };
   $("#looktog").onclick = () => { applyLook(document.documentElement.getAttribute("data-look") === "light" ? "dark" : "light"); drawSettings(); };
-  $("#savescreen").onclick = () => { const t = Number($("#taxrate").value); if (!isNaN(t) && t >= 0 && t < 40) S.settings.taxRate = t / 100; const tips = $("#tipbtns").value.split(",").map((x) => Number(x.trim())).filter((x) => x > 0 && x < 100).slice(0, 4); if (tips.length) S.settings.tips = tips; S.settings.bigVoid = Number($("#bigvoid").value) || 100; S.settings.bigDiscount = Number($("#bigdisc").value) || 25; audit("Changed settings"); save(); drawSettings(); toast("Saved"); };
+  $("#savescreen").onclick = () => { const t = Number($("#taxrate").value); if (!isNaN(t) && t >= 0 && t < 40) S.settings.taxRate = t / 100; const tips = $("#tipbtns").value.split(",").map((x) => Number(x.trim())).filter((x) => x > 0 && x < 100).slice(0, 4); if (tips.length) S.settings.tips = tips; S.settings.bigVoid = Number($("#bigvoid").value) || 100; S.settings.bigDiscount = Number($("#bigdisc").value) || 25; S.settings.autoTip = Math.min(40, Math.max(0, Number($("#autotip").value) || 0)); S.settings.buybackMax = Math.max(0, Math.round(Number($("#bbmax").value) || 0)); audit("Changed settings"); save(); drawSettings(); toast("Saved"); };
+  $("#hhtog").onclick = () => { S.settings.happy.on = !S.settings.happy.on; save(); drawSettings(); };
+  $("#hhdays").onclick = (e) => { const b = e.target.closest("button"); if (b) b.classList.toggle("on"); }; $("#hhcats").onclick = (e) => { const b = e.target.closest("button"); if (b) b.classList.toggle("on"); };
+  $("#savehh").onclick = () => { const h = S.settings.happy; h.start = $("#hhstart").value || h.start; h.end = $("#hhend").value || h.end; h.pct = Math.min(100, Math.max(0, Number($("#hhpct").value) || 0)); h.days = [...$("#hhdays .on")].map((b) => Number(b.dataset.d)); h.cats = [...$("#hhcats .on")].map((b) => b.dataset.c); audit("Happy hour changed", "", h.start + "-" + h.end + " " + h.pct + "%"); save(); drawSettings(); toast("Happy hour saved"); };
   $("#addgift").onclick = async () => { const amt = Number(await ask("Gift card amount", "In dollars", "50", "decimal")); if (!amt) return; const code = "GIFT-" + Math.floor(1000 + Math.random() * 9000); S.giftCards[code] = amt; audit("Sold gift card " + code, "", money(amt)); save(); drawSettings(); toast(code + " loaded with " + money(amt)); };
   $("#reset").onclick = () => { if (confirm("Throw away everything on this device and go back to the sample data?")) { localStorage.removeItem(KEY); location.reload(); } };
 }
