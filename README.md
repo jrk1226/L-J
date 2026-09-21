@@ -31,7 +31,7 @@ Managers can change these under Settings.
 - `index.html` - the whole app
 - `images/` - draft beer pictures (supplied by Josh) and cocktail photos
 
-## Cocktail photo credits
+## Photo credits
 
 Cropped from openly licensed photos on Wikimedia Commons:
 
@@ -41,3 +41,26 @@ Cropped from openly licensed photos on Wikimedia Commons:
 - Moscow Mule - "Moscow Mule at Rye, San Francisco", CC BY-SA 3.0
 - Aperol Spritz - "Aperol Spritz - July 2024" by Sarah Stierch, CC0
 - Well drink - "Gin and tonic with lime" by NotFromUtrecht, CC BY-SA 3.0
+- House red - "A glass of red wine" by Davide Restivo, CC BY-SA 2.0
+- House white - "Glass of White Wine shot with a bottle of white wine" by Evan Swigart, CC BY 2.0
+- Pinot Grigio - "A hand pours white wine from a bottle into a glass" by Shixart1985, CC BY 2.0
+- Cabernet - "Glass of Red Wine" by Sam Howzit, CC BY 2.0
+- Prosecco - "Prosecco and snacks in Tuscany" by laura.foto, CC BY 2.0
+- Soda - "Coca-Cola at restaurant Fylla's" by JIP, CC BY-SA 4.0
+- Iced tea - "Ice Tea" by MzScarlett, CC BY 2.0
+- Coffee - "Coffee cup on coffee beans" by Toni Cuenca, CC0
+- Sparkling water - "Sparkling Water with Mint in Glass Cup" by Tony Webster, CC BY 2.0
+- Wings - "Homemade buffalo wings" by stef yau, CC BY 2.0
+- Mozzarella sticks - "Fried Mozzarella Sticks at Millers Pub" by Kim Scarborough, CC BY-SA 2.0
+- Nachos - "Buffalo Nachos at Buffalo Bills" by pointnshoot, CC BY 2.0
+- Calamari - "Fried calamari" by Chensiyuan, CC BY-SA 3.0
+- Caesar salad - "Caesar Salad" by Prayitno, CC BY 2.0
+- Smash burger - "Cheeseburger with pickles", U.S. Department of Agriculture, public domain
+- Chicken sandwich - "Fried chicken Burger in Milan, Italy" by Pava, CC BY-SA 3.0 IT
+- Fish and chips - "Fish and chips at Sainsbury's Low Hall, Chingford, London" by Acabashi, CC BY-SA 4.0
+- Steak frites - "Steak frites at The Bar at MacArthur Place in Sonoma" by Sarah Stierch, CC BY 4.0
+- Penne vodka - "Penne Vodka" by J Doll, CC BY 3.0
+- Margherita pie - "Margherita Originale" by Mario56, CC BY-SA 3.0
+- Brownie sundae - "Chocolate brownie with a scoop of icecream from Gowlett, Peckham, London" by Ewan Munro, CC BY-SA 2.0
+- Cheesecake - "Mondays at Il Forno - Cheesecake with strawberry sauce" by Alex Dugger, CC BY 2.0
+- Cannoli - "Cannoli siciliani" by mat's eye, CC BY 2.0
