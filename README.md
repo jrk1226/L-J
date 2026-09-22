@@ -12,7 +12,7 @@ Two independent systems in one app. The switch sits under the L&J logo: Restaura
 
 ## How it looks
 
-Modelled on what the big systems do (Toast, Square, Lightspeed): a dark navigation rail with plain line icons, a light work area by default with a Dark look for dim rooms, the check on the left with the total and Send / Pay pinned at the bottom, the menu on the right with a search bar above it, category tabs each in their own colour, big photo tiles, and required choices marked red until picked and green once done. Everything a finger has to hit is at least 44 pixels.
+Modelled on the systems bars and restaurants already run (Toast, Square, Lightspeed, TouchBistro): a dark navigation rail with line icons; a top bar on every screen with the venue, the screen name, one search box, the clock and who is logged in; a light work area by default and a Dark look for dim rooms; the check drawn like a receipt with the total and a full-width Pay button pinned at the bottom and Send above it; the menu on the right with a search bar, colour-coded category tabs, photo tiles, and solid colour tiles for anything without a photo; the floor plan with chairs drawn around each table and the table tinted by its state; required choices marked red until picked and green once done. Everything a finger has to hit is at least 44 pixels.
 
 ## Bar workflow
 

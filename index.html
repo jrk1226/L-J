@@ -115,7 +115,7 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 .topbar input{flex:1;border:1px solid var(--line);border-radius:14px;padding:12px 16px 12px 42px;background:var(--panel);color:var(--ink);min-height:48px;font-size:15px;box-shadow:var(--sh1);background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg>");background-repeat:no-repeat;background-position:14px center}
 .topbar input:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-soft)}
 .topbar input::placeholder{color:var(--faint)}
-.results{display:grid;gap:6px;margin:0 0 14px}
+.results{display:grid;gap:6px}
 .results:empty{display:none}
 .results button{border:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;text-align:left;display:flex;justify-content:space-between;gap:12px;align-items:center}
 .results button b{font-weight:700}
@@ -223,6 +223,67 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 .kv b.good{color:var(--green)}.kv b.warn{color:var(--amber)}.kv b.bad{color:var(--red)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 #drawersheet .card{max-width:560px}
+
+/* ---- app bar (top of every screen) ---- */
+.appbar{display:flex;align-items:center;gap:16px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 10px 8px 16px;margin:0 0 16px;box-shadow:var(--sh1);position:sticky;top:10px;z-index:15}
+.appbar .crumb{display:flex;align-items:baseline;gap:8px;white-space:nowrap}
+.appbar .crumb b{font-size:12.5px;color:var(--muted);font-weight:600}
+.appbar .crumb b::after{content:"/";margin-left:8px;color:var(--faint)}
+.appbar .crumb span{font-size:18px;font-weight:700;letter-spacing:-.02em}
+.appbar .search{flex:1;position:relative;min-width:0}
+.appbar .search input{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 14px 10px 40px;background:var(--panel2);color:var(--ink);min-height:42px;font-size:14px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg>");background-repeat:no-repeat;background-position:13px center}
+.appbar .search input:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-soft);background-color:var(--panel)}
+.appbar .search input::placeholder{color:var(--faint)}
+.appbar .results{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh2);padding:6px;margin:0;max-height:60vh;overflow:auto;z-index:20}
+.appbar .who{display:flex;align-items:center;gap:12px;white-space:nowrap}
+.appbar .clock{text-align:right;line-height:1.15}
+.appbar .clock b{display:block;font-size:14px;font-weight:700}
+.appbar .clock small{color:var(--muted);font-size:11.5px}
+.appbar .avatar{width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--panel);display:grid;place-items:center;font-weight:700;font-size:13px}
+.appbar .me{line-height:1.15}
+.appbar .me b{display:block;font-size:13.5px}
+.appbar .me small{color:var(--muted);font-size:11.5px;text-transform:capitalize}
+@media (max-width:820px){.appbar{position:static;padding:8px 10px}.appbar .crumb b,.appbar .clock,.appbar .me{display:none}}
+.rail .off{margin-top:auto}
+.rail .look{margin-top:auto}
+.rail .off + .look{margin-top:8px}
+
+/* ---- receipt-style check ---- */
+.check{border-radius:18px}
+.acts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 12px 12px;background:var(--panel2);border-top:1px solid var(--line)}
+.acts .fire{grid-column:1/-1}
+.acts .btn.pay{grid-column:1/-1;min-height:56px;font-size:17px;display:flex;justify-content:space-between;align-items:center;padding:0 18px;order:9}
+.acts .btn.pay .mono{font-size:19px;font-weight:700}
+.acts #btnSend{grid-column:1/-1;min-height:50px;font-size:15px}
+.totals{padding:12px 16px 8px}
+.line{padding:11px 16px}
+.line .q{background:var(--amber-soft);color:var(--amber)}
+.ohead{background:transparent;border:0;box-shadow:none;padding:0 2px;margin:0 0 12px}
+.ohead .tot{display:none}
+
+/* ---- solid colour tiles for items with no photo ---- */
+.item:not(.pic){background:hsl(var(--h,40) 62% 44%);border-color:transparent;color:#fff;justify-content:space-between;min-height:118px}
+.item:not(.pic)::before{display:none}
+.item:not(.pic) b{color:#fff;font-size:16px}
+.item:not(.pic) .p{color:#fff}
+.item:not(.pic) .hold{background:rgba(255,255,255,.18);color:#fff}
+.item:not(.pic) .hold.ask{background:rgba(255,255,255,.28)}
+.item:not(.pic) .p s{color:rgba(255,255,255,.7)}
+.item:not(.pic) .fav{background:rgba(255,255,255,.2);color:#fff}
+:root[data-look="dark"] .item:not(.pic){background:hsl(var(--h,40) 45% 34%)}
+
+/* ---- seats around tables ---- */
+.tbl{overflow:visible}
+.tbl .seats{position:absolute;inset:0;pointer-events:none}
+.tbl .seat{position:absolute;width:16px;height:6px;border-radius:3px;background:var(--line2);margin-left:-8px}
+.tbl .seat.t{top:-9px}.tbl .seat.b{bottom:-9px}
+.tbl .seats.round .seat{width:16px;height:6px;margin:-3px 0 0 -8px;transform-origin:center}
+.tbl[data-st="seated"] .seat,.tbl[data-st="entered"] .seat,.tbl[data-st="sent"] .seat,.tbl[data-st="served"] .seat,.tbl[data-st="ready"] .seat,.tbl[data-st="check"] .seat{background:var(--muted)}
+.tbl[data-st="entered"]{background:linear-gradient(180deg,var(--amber-soft),var(--panel))}
+.tbl[data-st="served"],.tbl[data-st="sent"]{background:linear-gradient(180deg,var(--green-soft),var(--panel))}
+.tbl[data-st="seated"]{background:linear-gradient(180deg,var(--blue-soft),var(--panel))}
+.tbl[data-st="check"]{background:linear-gradient(180deg,var(--purple-soft),var(--panel))}
+.floor{padding:14px 0;background-image:none;background:var(--panel2)}
 @media (max-width:820px){
   .floor{height:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:10px;background-image:none}
   .tbl:not(.stool){position:static!important;width:auto!important;height:auto!important;min-height:104px;border-radius:14px!important;text-align:left;align-items:flex-start}
@@ -559,18 +620,18 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
     <button data-v="guests"><i>GU</i>Guests</button>
     <button data-v="reports"><i>MG</i>Manager</button>
     <button data-v="settings"><i>ST</i>Settings</button>
-    <div class="me" id="mename"></div>
-    <div class="clock" id="clock"></div>
-    <div class="off" id="offline" hidden>Working offline</div>
+    <div class="off" id="offline" hidden>Offline</div>
     <button class="look" id="lookbtn" type="button">Light</button>
-    <button class="look" id="lockbtn" type="button">Lock</button>
   </nav>
 
   <main class="page">
+    <header class="appbar">
+      <div class="crumb"><b id="appvenue">Restaurant</b><span id="apptitle">Floor</span></div>
+      <div class="search"><input id="q" placeholder="Search a table, guest, drink, check number, employee" aria-label="Search"><div class="results" id="results"></div></div>
+      <div class="who"><div class="clock" id="clock"></div><div class="avatar" id="meav"></div><div class="me" id="mename"></div><button class="btn sm quiet" id="lockbtn" type="button">Lock</button></div>
+    </header>
     <!-- FLOOR -->
     <section class="view on" id="v-floor">
-      <div class="topbar"><input id="q" placeholder="Search anything: a drink, a guest, a table, a check number, an employee" aria-label="Search"></div>
-      <div class="results" id="results"></div>
       <div class="ready" id="ready"></div>
       <div class="legend" id="legend"></div>
       <div class="floortools" id="floortools"></div>
@@ -583,7 +644,7 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
         <button class="back" id="backfloor">Floor</button>
         <h2 id="tname">Table</h2>
         <div class="meta" id="tmeta"></div>
-        <div class="tot mono" id="ttot"></div>
+        <div class="tot mono" id="ttot" hidden></div>
         <button class="btn sm" id="moreBtn">More</button>
       </div>
       <div class="order">
@@ -595,9 +656,9 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
           <div class="acts">
             <div class="fire" id="firebar"></div>
             <button class="btn primary" id="btnSend">Send</button>
-            <button class="btn" id="btnPrint">Print check</button>
             <button class="btn" id="btnSplit">Split</button>
-            <button class="btn good" id="btnPay">Pay</button>
+            <button class="btn" id="btnPrint">Print</button>
+            <button class="btn good pay" id="btnPay">Pay</button>
           </div>
         </div>
         <div class="menuwrap">
@@ -1227,7 +1288,7 @@ const PERMS = {
 const ROLE_WORDS = { server: "Rings orders, sends, pays. Voiding sent items, comps and refunds ask for a manager.", bartender: "Same as a server, plus bar tabs are front and center.", host: "Floor and seating only.", cook: "Kitchen screens and 86ing items.", manager: "Everything on the floor, plus voids, comps, refunds, moving tables, reports and settings.", owner: "Everything." };
 function can(p) { return !!(me && (PERMS[me.role] || PERMS.server)[p]); }
 function audit(what, before, after, extra) { S.audit.push({ at: Date.now(), who: me ? me.name : "", what, before: before == null ? "" : String(before), after: after == null ? "" : String(after), extra: extra || "", terminal: (navigator.userAgent.match(/iPad|iPhone|Android/) || ["This terminal"])[0] }); if (S.audit.length > 2000) S.audit.splice(0, S.audit.length - 2000); }
-function setMe(s) { me = s; unlocked = {}; try { sessionStorage.setItem("lj-me", s ? s.id : ""); } catch (e) {} $("#mename").textContent = s ? s.name + " - " + s.role : ""; $("#lock").hidden = !!s; }
+function setMe(s) { me = s; unlocked = {}; try { sessionStorage.setItem("lj-me", s ? s.id : ""); } catch (e) {} $("#mename").innerHTML = s ? "<b>" + esc(s.name) + "</b><small>" + esc(s.role) + "</small>" : ""; $("#meav").textContent = s ? s.name.split(" ").map((x) => x[0]).join("").slice(0, 2).toUpperCase() : ""; $("#lock").hidden = !!s; }
 function pinPad(padEl, dotsEl, onFull) {
   let buf = "";
   const draw = () => [...dotsEl.children].forEach((d, i) => d.classList.toggle("on", i < buf.length));
@@ -1317,7 +1378,7 @@ function longPress(el, onTap, onHold) {
 function applyLook(l) { document.documentElement.setAttribute("data-look", l); $("#lookbtn").textContent = l === "light" ? "Dark" : "Light"; try { localStorage.setItem("lj-look", l); } catch (e) {} }
 $("#lookbtn").onclick = () => applyLook(document.documentElement.getAttribute("data-look") === "light" ? "dark" : "light");
 function applyBig() { document.documentElement.toggleAttribute("data-big", !!S.settings.big); }
-function tickClock() { const d = new Date(); $("#clock").innerHTML = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) + "<br>" + timeOf(d); }
+function tickClock() { const d = new Date(); $("#clock").innerHTML = "<b>" + timeOf(d) + "</b><small>" + d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) + "</small>"; }
 
 // ---------- views ----------
 let view = "floor", unlocked = {};
@@ -1332,6 +1393,7 @@ function show(v) {
 }
 function redraw() {
   updateCounts();
+  const titles = { floor: VENUE === "bar" ? "Bar" : "Floor", order: "Order", kitchen: "Kitchen", tabs: "Bar tabs", guests: "Guests", reports: "Manager", settings: "Settings" }; $("#apptitle").textContent = titles[view] || ""; $("#appvenue").textContent = VENUES[VENUE];
   if (view === "floor") drawFloor(); if (view === "order") drawOrder(); if (view === "kitchen") drawKitchen(); if (view === "tabs") drawTabs(); if (view === "guests") drawGuests(); if (view === "reports") drawReports(); if (view === "settings") drawSettings();
 }
 $("#tabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b && b.dataset.v) show(b.dataset.v); });
@@ -1360,6 +1422,16 @@ function backbarBottles() {
   return out + "</svg>";
 }
 
+// Little chairs drawn around each table, the way the floor-plan systems draw them.
+function seatsHTML(t) {
+  const n = Math.min(t.seats || 0, 12); if (!n || t.shape === "bar" || t.id === "TO") return "";
+  let out = "";
+  if (t.shape === "round") { for (let i = 0; i < n; i++) { const a = (Math.PI * 2 / n) * i - Math.PI / 2; out += "<i class='seat' style='left:" + (50 + 57 * Math.cos(a)).toFixed(1) + "%;top:" + (50 + 57 * Math.sin(a)).toFixed(1) + "%;transform:rotate(" + Math.round(a * 180 / Math.PI + 90) + "deg)'></i>"; } return "<span class='seats round'>" + out + "</span>"; }
+  const top = Math.ceil(n / 2), bottom = n - top;
+  for (let i = 0; i < top; i++) out += "<i class='seat t' style='left:" + ((i + 0.5) / top * 100) + "%'></i>";
+  for (let i = 0; i < bottom; i++) out += "<i class='seat b' style='left:" + ((i + 0.5) / bottom * 100) + "%'></i>";
+  return "<span class='seats'>" + out + "</span>";
+}
 let mineOnly = false;
 function drawFloor() {
   $("#legend").innerHTML = Object.entries(STATES).filter(([k]) => VENUE !== "bar" || (k !== "sent" && k !== "ready")).map(([k, v]) => "<span><i style='background:" + stateColor(k) + "'></i>" + v + "</span>").join("");
@@ -1397,7 +1469,7 @@ function drawFloor() {
       const b = document.createElement("button"); b.className = "tbl " + (t.shape === "round" ? "round" : t.shape === "bar" ? "bar" : "") + (c && me && c.server === me.id ? " mine" : "");
       b.dataset.st = st; b.dataset.t = t.id; b.style.left = t.x + "%"; b.style.top = t.y + "%"; b.style.width = t.w + "%"; b.style.height = t.h + "%";
       const who = c ? staffName(c.server) : "";
-      b.innerHTML = "<b>" + esc(t.label) + "</b>" + (c ? "<small>" + c.guests + (c.guests === 1 ? " guest" : " guests") + " &middot; " + esc(who) + "</small><small>" + mins(c.opened) + " min</small><span class='amt mono'>" + money(sums(c.lines).total) + "</span>" : "<small>" + (VENUE === "bar" ? "open" : t.seats ? t.seats + " seats" : "phone and walk-up") + "</small>") + "<span class='st'>" + STATES[st] + "</span>";
+      b.innerHTML = seatsHTML(t) + "<b>" + esc(t.label) + "</b>" + (c ? "<small>" + c.guests + (c.guests === 1 ? " guest" : " guests") + " &middot; " + esc(who) + "</small><small>" + mins(c.opened) + " min</small><span class='amt mono'>" + money(sums(c.lines).total) + "</span>" : "<small>" + (VENUE === "bar" ? "open" : t.seats ? t.seats + " seats" : "phone and walk-up") + "</small>") + "<span class='st'>" + STATES[st] + "</span>";
       longPress(b, () => openTable(t.id), () => tableMenu(t.id));
       f.appendChild(b);
     }
@@ -1533,6 +1605,7 @@ function drawLines() {
   for (const co of heldCourses) { const b = document.createElement("button"); b.className = "btn"; const n = held.filter((l) => lineCourse(l) === co).length; b.textContent = "Fire " + COURSES[co].toLowerCase() + " (" + n + ")"; b.onclick = () => fireCourse(co); F.appendChild(b); }
   if (unsent.length && unsent.some((l) => lineCourse(l) === "entree") && unsent.some((l) => lineCourse(l) !== "entree")) { const b = document.createElement("button"); b.className = "btn"; b.textContent = "Hold entrees, send the rest"; b.onclick = () => { snap(); unsent.filter((l) => lineCourse(l) === "entree").forEach((l) => (l.status = "held")); sendNow(); }; F.appendChild(b); }
   $("#btnPay").disabled = !c.lines.length; $("#btnPrint").disabled = !c.lines.length; $("#btnSplit").disabled = !c.lines.length;
+  $("#btnPay").innerHTML = c.lines.length ? "Pay <span class='mono'>" + money(remaining(c)) + "</span>" : "Pay";
 }
 function moveLineToGuest(lineId, g) { const c = curCheck(); const l = c.lines.find((x) => x.id === lineId); if (!l || l.guest === g) return; snap(); const from = l.guest; l.guest = g; c.touched = Date.now(); save(); drawOrder(); toast(l.name + " moved to guest " + g, true); audit("Moved item to another guest", "Guest " + from, "Guest " + g, l.name); }
 
