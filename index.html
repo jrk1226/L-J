@@ -1142,6 +1142,7 @@ function withDefaults(s) {
   s.settings = s.settings || {}; if (!s.settings.happy) s.settings.happy = { on: VENUE === "bar", start: "16:00", end: "19:00", days: [1, 2, 3, 4, 5], pct: 20, cats: ["tap", "bottles", "liquor"] };
   if (s.settings.autoTip == null) s.settings.autoTip = 20; if (s.settings.buybackMax == null) s.settings.buybackMax = 4;
   if (!s.drawer) s.drawer = { bank: 200, drops: [], openedAt: Date.now() }; if (!s.shifts) s.shifts = [];
+  for (const id of Object.keys(s.checks || {})) { const c = s.checks[id]; if (c && c.quick && !c.lines.length && !c.payments.length) delete s.checks[id]; }
   for (const c of s.closed || []) if (c.cash == null) { c.cash = c.method === "Cash" ? c.sale + c.tax - (c.discount || 0) + c.tip : 0; c.cardTip = c.method === "Cash" ? 0 : c.tip; }
   return s;
 }
@@ -1323,6 +1324,7 @@ let view = "floor", unlocked = {};
 function show(v) {
   if (v === "reports" && !can("manager") && !unlocked.reports) { needManager("manager", "The manager screen needs a manager PIN").then((ok) => { if (ok) { unlocked.reports = true; audit("Opened the manager screen", "", "approved by " + ok.name); show("reports"); } }); return; }
   if (v === "settings" && !can("settings") && !unlocked.settings) { needManager("settings", "Settings need a manager PIN").then((ok) => { if (ok) { unlocked.settings = true; audit("Opened settings", "", "approved by " + ok.name); show("settings"); } }); return; }
+  if (view === "order" && v !== "order") dropEmptyQuick();
   view = v;
   $$(".view").forEach((s) => s.classList.toggle("on", s.id === "v-" + v));
   $$("#tabs button[data-v]").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
@@ -1412,6 +1414,8 @@ function drawFloor() {
 }
 function stateColor(k) { return { available: "var(--faint)", seated: "var(--blue)", entered: "var(--amber)", sent: "var(--amber)", ready: "var(--green)", served: "var(--green)", check: "var(--purple)", paid: "var(--muted)" }[k]; }
 // Quick sale: a walk-up who pays right now. No stool, no tab. Ring it up, take the money, done.
+// An empty quick sale is nothing. Whatever way you leave it, it goes away.
+function dropEmptyQuick() { let n = 0; for (const c of Object.values(S.checks)) if (c.quick && !c.lines.length && !c.payments.length) { delete S.checks[c.id]; if (cur === c.id) cur = null; n++; } if (n) save(); }
 function quickSale() {
   const c = { id: uid(), no: S.nextNo++, tableId: null, tab: { name: "Quick sale", phone: "", card: "" }, quick: true, server: me ? me.id : "", guests: 1, opened: Date.now(), touched: Date.now(), guestId: null, allergy: "", requested: false, payments: [], parts: null, lines: [] };
   S.checks[c.id] = c; audit("Quick sale " + c.no, "", ""); save(); cur = c.id; curGuest = 1; show("order");
