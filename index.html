@@ -280,6 +280,31 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 .tbl[data-st="ready"]{box-shadow:inset 0 0 0 3px var(--green),var(--sh1)}
 .tbl.mine::before{display:none}
 .legend{margin:0 0 4px;align-items:center}
+
+/* ---- bar venue: the order screen is home (Rezku-style) ---- */
+:root[data-venue="bar"] .ohead{padding:0 2px;gap:10px}
+.where{display:flex;gap:8px;align-items:center}
+.where .wb{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:12px;padding:10px 16px;font-weight:700;font-size:14px;min-height:44px}
+.where .wb.on{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+:root[data-look="dark"] .where .wb.on{background:var(--amber);color:var(--amber-ink);border-color:var(--amber)}
+.where .qs{font-size:12px;font-weight:700;color:var(--amber);background:var(--amber-soft);padding:6px 10px;border-radius:999px}
+.crumbs{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);margin:0 2px 10px}
+.crumbs i{font-style:normal;color:var(--faint);font-size:18px;line-height:1}
+.crumbs b{color:var(--ink);font-weight:700;font-size:16px}
+.crumbs small{margin-left:auto;font-size:12px;color:var(--muted)}
+:root[data-venue="bar"] .menuwrap{display:flex;flex-direction:column;height:calc(100vh - 148px);position:sticky;top:12px}
+:root[data-venue="bar"] .menuwrap .topbar{order:0}
+:root[data-venue="bar"] .crumbs{order:1}
+:root[data-venue="bar"] .menu{order:2;flex:1;min-height:0;overflow:auto;align-content:start;grid-auto-rows:max-content;margin-bottom:12px;padding:2px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+:root[data-venue="bar"] .cats{order:3;margin:0;gap:8px;padding:0}
+:root[data-venue="bar"] .cats button{flex:1 1 150px;min-height:64px;justify-content:center;border-radius:12px;font-size:16px;font-weight:700;color:#fff;background:hsl(var(--h,40) 55% 42%);border-color:transparent;box-shadow:var(--sh1)}
+:root[data-venue="bar"] .cats button .dot{display:none}
+:root[data-venue="bar"] .cats button.on{background:hsl(var(--h,40) 70% 48%);box-shadow:0 0 0 3px var(--panel),0 0 0 5px hsl(var(--h,40) 70% 48%)}
+:root[data-venue="bar"] .item{padding:8px;gap:6px}
+:root[data-venue="bar"] .item b{font-size:14px}
+:root[data-venue="bar"] .item .art{border-radius:10px}
+:root[data-venue="bar"] .item:not(.pic){min-height:150px}
+:root[data-big][data-venue="bar"] .cats button{min-height:76px;font-size:18px}
 @media (max-width:820px){
   .floor{height:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:10px;background-image:none}
   .tbl:not(.stool){position:static!important;width:auto!important;height:auto!important;min-height:104px;border-radius:14px!important;text-align:left;align-items:flex-start}
@@ -374,7 +399,7 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 .item:hover{box-shadow:var(--sh2);transform:translateY(-1px)}
 .item:active{transform:scale(.97)}
 .item.pic{min-height:0}
-.item .art{position:relative;aspect-ratio:1/1;width:100%;margin:0 0 2px;border-radius:12px;background:var(--panel2);display:grid;place-items:center;overflow:hidden}
+.item .art{position:relative;aspect-ratio:1/1;width:100%;flex:none;margin:0 0 2px;border-radius:12px;background:var(--panel2);display:grid;place-items:center;overflow:hidden}
 .item .art svg{width:52px;height:52px;color:var(--ink)}
 .item .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:8px;background:#fff}
 .item .art img.cover{object-fit:cover;padding:0;background:transparent}
@@ -624,7 +649,7 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
     <header class="appbar">
       <div class="crumb"><b id="appvenue">Restaurant</b><span id="apptitle">Floor</span></div>
       <div class="search"><input id="q" placeholder="Search a table, guest, drink, check number, employee" aria-label="Search"><div class="results" id="results"></div></div>
-      <div class="who"><div class="clock" id="clock"></div><div class="avatar" id="meav"></div><div class="me" id="mename"></div><button class="btn sm quiet" id="lockbtn" type="button">Lock</button></div>
+      <div class="who"><button class="btn sm primary" id="ordersBtn" hidden>Orders</button><div class="clock" id="clock"></div><div class="avatar" id="meav"></div><div class="me" id="mename"></div><button class="btn sm quiet" id="lockbtn" type="button">Lock</button></div>
     </header>
     <!-- FLOOR -->
     <section class="view on" id="v-floor">
@@ -642,6 +667,7 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
       <div class="ohead">
         <button class="back" id="backfloor">Floor</button>
         <h2 id="tname">Table</h2>
+        <div class="where" id="where" hidden></div>
         <div class="meta" id="tmeta"></div>
         <div class="tot mono" id="ttot" hidden></div>
         <button class="btn sm" id="moreBtn">More</button>
@@ -662,6 +688,7 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
         </div>
         <div class="menuwrap">
           <div class="topbar" style="margin-bottom:10px"><input id="mq" placeholder="Search the menu" aria-label="Search the menu"></div>
+          <div class="crumbs" id="crumbs" hidden></div>
           <div class="cats" id="cats"></div>
           <div class="menu" id="menu"></div>
         </div>
@@ -1302,7 +1329,7 @@ function pinPad(padEl, dotsEl, onFull) {
 const lockPad = pinPad($("#pad"), $("#dots"), (v) => {
   const s = S.staff.find((x) => x.pin === v);
   if (!s) { lockPad.shake(); $("#lockmsg").textContent = "That PIN does not match anyone. Try again."; return; }
-  $("#lockmsg").textContent = "Tap your four numbers to clock in"; setMe(s); audit("Clocked in"); show(s.role === "cook" && VENUE !== "bar" ? "kitchen" : s.role === "bartender" && VENUE !== "bar" ? "tabs" : "floor"); toast("Hi " + s.name);
+  $("#lockmsg").textContent = "Tap your four numbers to clock in"; setMe(s); audit("Clocked in"); if (VENUE === "bar") barHome(); else show(s.role === "cook" ? "kitchen" : s.role === "bartender" ? "tabs" : "floor"); toast("Hi " + s.name);
 });
 $("#lockbtn").onclick = () => { audit("Locked the screen"); setMe(null); };
 // the switch between the two systems
@@ -1321,6 +1348,9 @@ document.querySelectorAll("#tabs button[data-v]").forEach((b) => { const i = b.q
 // Every category gets its own colour so the rail of tabs and the tiles read at a glance, the way the big systems do it.
 const CAT_HUES = [28, 200, 340, 150, 262, 45, 190, 0, 100, 215, 300, 20];
 function catHue(id) { const i = S.cats.findIndex((c) => c.id === id); return CAT_HUES[(i < 0 ? 0 : i) % CAT_HUES.length]; }
+// Bar: the order screen is home. One tap and you are ringing drinks; Orders (top right) shows every open check and the stools.
+function barHome() { const c = curCheck(); if (c && S.checks[c.id]) { show("order"); return; } quickSale(); }
+if (VENUE === "bar") { document.documentElement.setAttribute("data-venue", "bar"); $("#ordersBtn").hidden = false; $("#ordersBtn").onclick = () => show("floor"); $("#backfloor").textContent = "Orders"; }
 if (VENUE === "bar") { $("#tabs button[data-v=\"kitchen\"]").hidden = true; $("#tabs button[data-v=\"floor\"]").innerHTML = "<i>" + ICONS.bar + "</i>Bar<span class='n' id='rcount'></span>"; $("#backfloor").textContent = "Bar"; $("#q").placeholder = "Search anything: a drink, a guest, a stool, a tab, a check number"; }
 $("#venuebtn").textContent = VENUES[VENUE];
 $("#venuebtn").onclick = async () => {
@@ -1386,16 +1416,17 @@ function show(v) {
   if (v === "settings" && !can("settings") && !unlocked.settings) { needManager("settings", "Settings need a manager PIN").then((ok) => { if (ok) { unlocked.settings = true; audit("Opened settings", "", "approved by " + ok.name); show("settings"); } }); return; }
   if (view === "order" && v !== "order") dropEmptyQuick();
   view = v;
+  if (VENUE === "bar") setTimeout(() => { const fb = $("#tabs button[data-v=\"floor\"]"); if (fb) fb.classList.toggle("on", v === "order" || v === "floor"); }, 0);
   $$(".view").forEach((s) => s.classList.toggle("on", s.id === "v-" + v));
   $$("#tabs button[data-v]").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
   redraw(); window.scrollTo({ top: 0 });
 }
 function redraw() {
   updateCounts();
-  const titles = { floor: VENUE === "bar" ? "Bar" : "Floor", order: "Order", kitchen: "Kitchen", tabs: "Bar tabs", guests: "Guests", reports: "Manager", settings: "Settings" }; $("#apptitle").textContent = titles[view] || ""; $("#appvenue").textContent = VENUES[VENUE];
+  const titles = { floor: VENUE === "bar" ? "Orders" : "Floor", order: VENUE === "bar" ? "Bar" : "Order", kitchen: "Kitchen", tabs: "Bar tabs", guests: "Guests", reports: "Manager", settings: "Settings" }; $("#apptitle").textContent = titles[view] || ""; $("#appvenue").textContent = VENUES[VENUE];
   if (view === "floor") drawFloor(); if (view === "order") drawOrder(); if (view === "kitchen") drawKitchen(); if (view === "tabs") drawTabs(); if (view === "guests") drawGuests(); if (view === "reports") drawReports(); if (view === "settings") drawSettings();
 }
-$("#tabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b && b.dataset.v) show(b.dataset.v); });
+$("#tabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b || !b.dataset.v) return; if (VENUE === "bar" && b.dataset.v === "floor") { barHome(); return; } show(b.dataset.v); });
 
 // ============================================================
 //  FLOOR PLAN (home screen)
@@ -1566,7 +1597,32 @@ function drawOrder() {
   $("#tname").textContent = t ? tableName(t) : c.quick ? "Quick sale" : "Tab: " + (c.tab.name || "no name");
   $("#tmeta").innerHTML = "<span><b>" + c.guests + "</b> " + (c.guests === 1 ? "guest" : "guests") + "</span><span><b>" + esc(staffName(c.server)) + "</b></span><span>seated <b>" + mins(c.opened) + " min</b></span><span>check <b>" + c.no + "</b></span>" + (c.guestId ? "<span><b>" + esc(guestName(c.guestId)) + "</b>" + ((guestOf(c.guestId) || {}).vip ? " VIP" : "") + "</span>" : "") + (c.allergy ? "<span style='color:var(--red)'><b>ALLERGY: " + esc(c.allergy) + "</b></span>" : "");
   $("#ttot").textContent = money(checkTotals(c).total);
+  const W = $("#where"); W.hidden = VENUE !== "bar";
+  if (VENUE === "bar") {
+    $("#tname").hidden = true;
+    W.innerHTML = "<button class='wb" + (t ? " on" : "") + "' data-w='stool'>" + (t ? esc(tableName(t)) : "Stool") + "</button><button class='wb" + (!t && c.tab && !c.quick ? " on" : "") + "' data-w='tab'>" + (!t && c.tab && !c.quick ? esc(c.tab.name || "Tab") : "Tab") + "</button><button class='wb" + (c.guestId ? " on" : "") + "' data-w='guest'>" + (c.guestId ? esc(guestName(c.guestId)) : "Guest") + "</button>" + (c.quick ? "<span class='qs'>Quick sale</span>" : "");
+    W.onclick = (e) => { const b = e.target.closest("button"); if (b) whereFlow(b.dataset.w); };
+  } else $("#tname").hidden = false;
   drawGuestsBar(); drawLines(); drawMenu();
+}
+// Bar: where does this check live? A stool, a named tab, or nowhere (quick sale). Any can be picked after the drinks are rung in.
+async function whereFlow(kind) {
+  const c = curCheck(); if (!c) return;
+  if (kind === "stool") {
+    const v = await pick("Which stool?", "Only open stools are listed.", S.tables.filter((t) => !checkOfTable(t.id) || t.id === c.tableId).map((t) => ({ label: tableName(t), value: t.id })).concat(c.tableId ? [{ label: "Take it off the stool", value: "none" }] : []));
+    if (!v) return; snap(); if (v === "none") { c.tableId = null; c.tab = c.tab || { name: "", phone: "", card: "" }; c.quick = true; } else { c.tableId = v; c.tab = null; c.quick = false; if (c.guestId) { const g = guestOf(c.guestId); if (g) { c.guestId = g.id; } } }
+    audit("Check " + c.no + " moved", "", checkLabel(c)); save(); drawOrder(); return;
+  }
+  if (kind === "tab") {
+    const name = await ask("Name on the tab", "A name, or what they look like.", c.tab && !c.quick ? c.tab.name : ""); if (name == null) return;
+    const card = await ask("Card last four (optional)", "Keeps the card on file for Last call.", c.tab ? c.tab.card : ""); if (card == null) return;
+    snap(); c.tableId = null; c.quick = false; c.tab = { name: name || ("Card " + card), phone: "", card: card || "" };
+    audit("Tab opened on check " + c.no, "", c.tab.name); save(); drawOrder(); toast("Tab: " + c.tab.name); return;
+  }
+  if (kind === "guest") {
+    const v = await pick("Who is this?", "Their visits, usual and allergies follow the check.", [{ label: "Nobody (walk-in)", value: 0 }].concat(S.guests.map((g) => ({ label: g.name + (g.vip ? " - VIP" : ""), sub: [g.phone, g.usual ? "usual: " + g.usual : ""].filter(Boolean).join(" - "), value: g.id }))));
+    if (v === undefined) return; snap(); c.guestId = v || null; const g = guestOf(v); if (g && g.allergy && !c.allergy) c.allergy = g.allergy; save(); drawOrder();
+  }
 }
 function drawGuestsBar() {
   const c = curCheck(); const G = $("#guests"); G.innerHTML = "";
@@ -1630,6 +1686,7 @@ function favItems() {
 function drawMenu() {
   $("#cats").innerHTML = "<button data-c='fav' class='" + (cat === "fav" && !mq ? "on" : "") + "' style='--h:40'><i class='dot'></i>Favorites</button>" + S.cats.map((c) => "<button data-c='" + c.id + "' class='" + (c.id === cat && !mq ? "on" : "") + "' style='--h:" + catHue(c.id) + "'><i class='dot'></i>" + esc(c.name) + "</button>").join("");
   const list = mq ? S.items.filter((i) => i.name.toLowerCase().includes(mq)) : cat === "fav" ? favItems() : S.items.filter((i) => i.cat === cat);
+  const cr = $("#crumbs"); cr.hidden = VENUE !== "bar"; if (VENUE === "bar") cr.innerHTML = "<span>" + VENUES[VENUE] + "</span><i>&rsaquo;</i><b>" + esc(mq ? "Search: " + mq : cat === "fav" ? "Favorites" : (catOf(cat) || { name: "" }).name) + "</b><small>" + list.length + (list.length === 1 ? " item" : " items") + "</small>";
   const m = $("#menu"); m.innerHTML = "";
   if (!list.length) m.innerHTML = "<div class='empty' style='grid-column:1/-1'>" + (mq ? "Nothing on the menu matches that." : cat === "fav" ? "Favorites fill in on their own as you ring things up." : "Nothing here yet.") + "</div>";
   for (const it of list) {

@@ -16,6 +16,9 @@ Modelled on the systems bars and restaurants already run (Toast, SkyTab, Square,
 
 ## Bar workflow
 
+The bar's home screen is the order screen (the way Rezku and SkyTab do it): log in and you are ringing drinks. Check on the left with Stool / Tab / Guest buttons on top - ring the drinks first, then say where it lives, or leave it as a quick sale. Photo tiles in the middle, a breadcrumb over them, and the categories as big colour blocks along the bottom. Orders (top right) shows every open check and the stools.
+
+
 - **Quick sale** - a walk-up who pays now. Tap it, tap the drinks, "Ring up and pay", done. No stool, no tab.
 - **Same again** - on a stool's menu (hold the stool) or on the order screen: re-rings the last round in one tap.
 - **Happy hour** - set the days, hours, percent and which categories in Settings. Prices drop on their own and go back after; the tile shows the old price crossed out and the strip at the top says when it ends.
