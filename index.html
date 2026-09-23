@@ -152,63 +152,6 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 .tbl.mine::before{content:"";position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--amber)}
 .tbl.round.mine::before{top:10px;right:22%}
 
-/* Bar venue: a drawn bar with numbered stools along it */
-.barroom{position:relative;border-radius:var(--r);padding:16px 16px 22px;margin-bottom:6px;overflow:hidden;
-  background:
-    radial-gradient(120% 80% at 50% 0%,rgba(245,165,36,.10),transparent 60%),
-    repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 1px,transparent 1px 30px),
-    linear-gradient(180deg,#1b1410,#14100d);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 -40px 60px rgba(0,0,0,.35)}
-:root:not([data-look="dark"]) .barroom{background:radial-gradient(120% 80% at 50% 0%,rgba(245,165,36,.16),transparent 60%),repeating-linear-gradient(0deg,rgba(0,0,0,.05) 0 1px,transparent 1px 30px),linear-gradient(180deg,#f1e6d6,#e8dcc8);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
-.backbar{position:relative;height:74px;border-radius:12px 12px 0 0;overflow:hidden;
-  background:linear-gradient(180deg,#2b1a10 0%,#3d2617 45%,#2a190f 100%);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),inset 0 -2px 0 rgba(0,0,0,.5)}
-.backbar .glow{position:absolute;left:0;right:0;top:0;height:100%;background:radial-gradient(60% 100% at 50% 100%,rgba(245,165,36,.28),transparent 70%)}
-.backbar .shelf{position:absolute;left:14px;right:14px;height:4px;border-radius:2px;background:linear-gradient(180deg,#c99a5b,#7a5432);box-shadow:0 3px 6px rgba(0,0,0,.5)}
-.backbar svg{position:absolute;left:14px;right:14px;width:calc(100% - 28px);height:100%;display:block}
-.backbar .plaque{position:absolute;right:16px;top:8px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:#f2dcb4;background:linear-gradient(180deg,#8a6a3a,#5d4324);padding:4px 9px;border-radius:4px;box-shadow:0 1px 0 rgba(255,255,255,.2) inset,0 2px 4px rgba(0,0,0,.5)}
-.counter{position:relative;height:64px;border-radius:0 0 18px 18px;margin-bottom:14px;
-  background:
-    repeating-linear-gradient(94deg,rgba(0,0,0,.10) 0 3px,transparent 3px 15px,rgba(255,255,255,.05) 15px 17px,transparent 17px 31px),
-    linear-gradient(180deg,#a86f36 0%,#8a5628 30%,#6e421d 70%,#4f2e13 100%);
-  box-shadow:inset 0 3px 0 rgba(255,230,190,.35),inset 0 -6px 0 rgba(0,0,0,.35),0 10px 22px rgba(0,0,0,.45)}
-.counter .brass{position:absolute;left:14px;right:14px;bottom:-9px;height:7px;border-radius:4px;background:linear-gradient(180deg,#f3d58a,#b8862f 55%,#7a5518);box-shadow:0 3px 6px rgba(0,0,0,.5)}
-.counter .taps{position:absolute;left:50%;top:-10px;transform:translateX(-50%);display:flex;gap:14px}
-.counter .tap{width:14px;height:34px;position:relative}
-.counter .tap::before{content:"";position:absolute;left:4px;top:0;width:6px;height:24px;border-radius:3px;background:linear-gradient(90deg,#e7ecf2,#8f98a3 60%,#5c6470)}
-.counter .tap::after{content:"";position:absolute;left:0;top:-8px;width:14px;height:20px;border-radius:5px 5px 4px 4px;background:linear-gradient(180deg,var(--tapc,#c0392b),#7a1f16);box-shadow:0 1px 3px rgba(0,0,0,.5)}
-.counter .tap:nth-child(2){--tapc:#2e8b57}.counter .tap:nth-child(3){--tapc:#e0a832}.counter .tap:nth-child(4){--tapc:#2f6bd8}
-.counter .name{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#f7e6c4;font-size:15px;letter-spacing:.34em;text-transform:uppercase;font-weight:700;text-shadow:0 1px 0 rgba(0,0,0,.6);opacity:.85;padding-left:.34em}
-.stools{display:flex;flex-wrap:wrap;justify-content:center;gap:16px 6px;padding:10px 4px 0}
-.tbl.stool{position:relative;background:transparent;box-shadow:none;padding:0;flex:1 1 62px;min-width:62px;max-width:104px;align-items:center;text-align:center;gap:0;opacity:1;color:var(--ink)}
-.tbl.stool .seat{position:relative;width:66px;height:66px;border-radius:50%;display:grid;place-items:center;font-size:26px;font-weight:700;color:#f6e9d2;
-  background:radial-gradient(circle at 38% 30%,#6b3a22,#3a1d10 70%);
-  --ring:var(--seat-ring,#d9dde3);--ring2:var(--seat-ring2,#7d8590);--glow:0px;--ringc:transparent;
-  box-shadow:0 0 0 3px var(--ring),0 0 0 4px var(--ring2),0 0 var(--glow) var(--ringc),inset 0 0 0 4px rgba(0,0,0,.25),inset 0 3px 6px rgba(255,255,255,.15),0 6px 10px rgba(0,0,0,.5);
-  text-shadow:0 1px 0 rgba(0,0,0,.6);transition:transform .08s,box-shadow .12s}
-.tbl.stool .seat::before{content:"";position:absolute;inset:9px;border-radius:50%;border:1.5px dashed rgba(255,255,255,.22)}
-.tbl.stool .seat::after{content:"";position:absolute;left:50%;bottom:-18px;width:12px;height:18px;margin-left:-6px;background:linear-gradient(90deg,#b9c0c9,#6c7480 60%,#4d545e);border-radius:0 0 3px 3px;z-index:-1}
-.tbl.stool .foot{width:44px;height:10px;border-radius:50%;border:3px solid #9aa2ad;border-top-color:#d3d8de;margin-top:12px;box-shadow:0 3px 6px rgba(0,0,0,.45)}
-:root:not([data-look="dark"]) .barroom{--seat-ring:#f5f7fa;--seat-ring2:#98a1ac}
-.tbl.stool .cap{margin-top:8px;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:40px}
-.tbl.stool small{font-size:11px;line-height:1.2;width:100%;white-space:normal;color:var(--muted)}
-.tbl.stool .amt{margin-top:0;font-size:12.5px;color:var(--ink)}
-.tbl.stool .st{font-size:10px;margin-top:1px}
-.tbl.stool[data-st]{box-shadow:none;background:transparent;opacity:1;animation:none}
-.tbl.stool[data-st="available"] .seat{opacity:.72;filter:saturate(.7)}
-.tbl.stool[data-st="available"] .st{color:var(--faint)}
-.tbl.stool[data-st="seated"] .seat{--ring:var(--blue);--ring2:rgba(0,0,0,.3);--glow:16px;--ringc:var(--blue)}
-.tbl.stool[data-st="entered"] .seat{--ring:var(--amber);--ring2:rgba(0,0,0,.3);--glow:16px;--ringc:var(--amber)}
-.tbl.stool[data-st="sent"] .seat,.tbl.stool[data-st="served"] .seat{--ring:var(--green);--ring2:rgba(0,0,0,.3);--glow:16px;--ringc:var(--green)}
-.tbl.stool[data-st="ready"] .seat{--ring:var(--green);--ring2:var(--green);--glow:22px;--ringc:var(--green);animation:blink 1.4s infinite}
-.tbl.stool[data-st="check"] .seat{--ring:var(--purple);--ring2:rgba(0,0,0,.3);--glow:16px;--ringc:var(--purple)}
-.tbl.stool[data-st="paid"] .seat{--ring:var(--muted);--ring2:rgba(0,0,0,.3);opacity:.55}
-.tbl.stool:active .seat{transform:scale(.94)}
-.tbl.stool.sel .seat{outline:3px solid var(--amber);outline-offset:6px}
-.tbl.stool.sel{outline:none}
-.tbl.stool.mine::before{top:-2px;right:8px;width:10px;height:10px;box-shadow:0 0 0 2px var(--panel)}
-:root[data-big] .tbl.stool{min-width:78px;max-width:120px}:root[data-big] .tbl.stool .seat{width:82px;height:82px;font-size:32px}
-
 /* Bar workflow: happy hour strip, same again, drawer sheet */
 .btn.warn{background:var(--amber-soft);color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber)}
 .floortools .sp{flex:1}
@@ -284,6 +227,59 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
 .tbl[data-st="seated"]{background:linear-gradient(180deg,var(--blue-soft),var(--panel))}
 .tbl[data-st="check"]{background:linear-gradient(180deg,var(--purple-soft),var(--panel))}
 .floor{padding:14px 0;background-image:none;background:var(--panel2)}
+
+/* ---- home: list on the left, flat map on the right ---- */
+.home{display:grid;grid-template-columns:340px 1fr;gap:14px;align-items:start;margin:0 0 12px}
+@media (max-width:1000px){.home{grid-template-columns:1fr}}
+.checklist{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh1);display:flex;flex-direction:column;overflow:hidden;max-height:calc(100vh - 220px);min-height:320px}
+.ltabs{display:flex;gap:4px;padding:10px 10px 6px;border-bottom:1px solid var(--line)}
+.ltabs button{border:0;background:transparent;color:var(--muted);font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:999px}
+.ltabs button b{font-weight:700;margin-left:2px}
+.ltabs button.on{background:var(--ink);color:var(--panel)}
+:root[data-look="dark"] .ltabs button.on{background:var(--amber);color:var(--amber-ink)}
+.lrows{overflow:auto;flex:1}
+.lrow{display:grid;grid-template-columns:4px 1fr auto;gap:0 12px;align-items:center;padding:10px 12px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);text-align:left;width:100%}
+.lrow:hover{background:var(--panel2)}
+.lrow .bar{width:4px;height:36px;border-radius:2px}
+.lrow b{display:block;font-weight:700;font-size:14px}
+.lrow small{display:block;font-size:12px;color:var(--muted);margin-top:1px}
+.lrow .r{text-align:right}
+.lrow .r b{font-size:14px}
+.lrow .r small.st{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;margin-top:3px;background:var(--raise);color:var(--muted)}
+.lrow .st[data-st="seated"]{color:var(--blue);background:var(--blue-soft)}.lrow .st[data-st="entered"],.lrow .st[data-st="sent"]{color:var(--amber);background:var(--amber-soft)}.lrow .st[data-st="ready"],.lrow .st[data-st="served"]{color:var(--green);background:var(--green-soft)}.lrow .st[data-st="check"]{color:var(--purple);background:var(--purple-soft)}
+.lrow.closed{opacity:.8}
+.map{min-width:0}
+.floortools{align-items:center}
+.floortools .vsep{width:1px;height:24px;background:var(--line);margin:0 4px}
+.serverchips{display:flex;gap:6px;flex-wrap:wrap}
+.schip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:4px 12px 4px 4px;font-size:13px;font-weight:600;color:var(--ink)}
+.schip i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700;color:#0B0E13}
+.schip small{color:var(--muted);font-weight:600;font-size:11px}
+.schip.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.hhbadge{color:var(--amber);font-weight:700;font-size:12.5px;padding:8px 12px;border-radius:10px;background:var(--amber-soft);white-space:nowrap}
+/* the bar as flat shapes */
+.flatbar{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:16px 18px 18px;position:relative}
+.flatbar .slab{height:64px;border-radius:14px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:24px;color:var(--muted);font-size:12.5px;font-weight:600;box-shadow:var(--sh1)}
+.flatbar .slab i{width:1px;height:28px;background:var(--line)}
+.stoolrow{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:14px 6px;padding:18px 6px 0}
+@media (min-width:1500px){.stoolrow{grid-template-columns:repeat(16,minmax(0,1fr))}}
+.stool2{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0;color:var(--ink)}
+.stool2 .dot{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:16px;background:var(--panel);border:2px solid var(--line2);color:var(--muted);transition:transform .08s}
+.stool2.busy .dot{border-color:transparent;color:#0B0E13}
+.stool2:active .dot{transform:scale(.94)}
+.stool2 small{font-size:10.5px;color:var(--muted);font-weight:600;margin-top:4px}
+.stool2 b{font-size:12px;font-weight:700}
+.stool2 em{font-style:normal;font-size:10px;font-weight:700}
+.stool2.dim,.tbl.dim{opacity:.35}
+.stool2.sel .dot{outline:3px solid var(--amber);outline-offset:3px}
+.stool2[data-st="ready"] .dot{animation:blink 1.4s infinite}
+:root[data-big] .stool2 .dot{width:58px;height:58px;font-size:20px}
+/* restaurant tables: server colour ring when occupied */
+.tbl{--sc:var(--line2)}
+.tbl[data-st="seated"],.tbl[data-st="entered"],.tbl[data-st="sent"],.tbl[data-st="served"],.tbl[data-st="check"]{box-shadow:inset 0 0 0 2px var(--sc),var(--sh1)}
+.tbl[data-st="ready"]{box-shadow:inset 0 0 0 3px var(--green),var(--sh1)}
+.tbl.mine::before{display:none}
+.legend{margin:0 0 4px;align-items:center}
 @media (max-width:820px){
   .floor{height:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:10px;background-image:none}
   .tbl:not(.stool){position:static!important;width:auto!important;height:auto!important;min-height:104px;border-radius:14px!important;text-align:left;align-items:flex-start}
@@ -633,9 +629,12 @@ h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
     <!-- FLOOR -->
     <section class="view on" id="v-floor">
       <div class="ready" id="ready"></div>
-      <div class="legend" id="legend"></div>
       <div class="floortools" id="floortools"></div>
-      <div id="floorwrap"></div>
+      <div class="home">
+        <aside class="checklist" id="checklist"><div class="ltabs" id="ltabs"></div><div class="lrows" id="lrows"></div></aside>
+        <div class="map" id="floorwrap"></div>
+      </div>
+      <div class="legend" id="legend"></div>
     </section>
 
     <!-- TABLE / ORDER -->
@@ -1413,15 +1412,6 @@ function tableState(t) {
   return "entered";
 }
 
-// Two shelves of bottles for the back bar picture. Same bottles every time, nothing random on screen.
-function backbarBottles() {
-  const cols = ["#5aa35a", "#c98a2e", "#e8dcc0", "#8b3a2f", "#3f6fb5", "#b56b2c", "#6a3d7a", "#d9c27a", "#4a8f8a", "#c1553c"];
-  let out = "<svg viewBox='0 0 1000 74' preserveAspectRatio='none' aria-hidden='true'>";
-  const shelf = (y, n, seed) => { const gap = 1000 / n; for (let i = 0; i < n; i++) { const k = (i * 7 + seed) % cols.length; const h = 16 + ((i * 5 + seed) % 4) * 3; const w = 7 + ((i * 3 + seed) % 3); const x = i * gap + gap / 2 - w / 2; out += "<rect x='" + x.toFixed(1) + "' y='" + (y - h) + "' width='" + w + "' height='" + h + "' rx='2' fill='" + cols[k] + "' opacity='.92'/><rect x='" + (x + w / 2 - 1.6).toFixed(1) + "' y='" + (y - h - 7) + "' width='3.2' height='8' rx='1' fill='" + cols[k] + "' opacity='.92'/><rect x='" + (x + 1.2).toFixed(1) + "' y='" + (y - h + 2) + "' width='1.4' height='" + (h - 6) + "' rx='.7' fill='#fff' opacity='.35'/>"; } };
-  shelf(30, 34, 1); shelf(68, 34, 4);
-  return out + "</svg>";
-}
-
 // Little chairs drawn around each table, the way the floor-plan systems draw them.
 function seatsHTML(t) {
   const n = Math.min(t.seats || 0, 12); if (!n || t.shape === "bar" || t.id === "TO") return "";
@@ -1432,56 +1422,77 @@ function seatsHTML(t) {
   for (let i = 0; i < bottom; i++) out += "<i class='seat b' style='left:" + ((i + 0.5) / bottom * 100) + "%'></i>";
   return "<span class='seats'>" + out + "</span>";
 }
-let mineOnly = false;
+// Each server gets a colour for the night, so the map reads by who owns what.
+const SERVER_HUES = ["#F5A524", "#6EA8FE", "#3DD68C", "#C084FC", "#FF8FA3", "#5EEAD4", "#FDBA74", "#A3E635"];
+function serverColor(id) { const i = S.staff.findIndex((x) => x.id === id); return SERVER_HUES[(i < 0 ? 0 : i) % SERVER_HUES.length]; }
+let mineOnly = false, listTab = "open";
 function drawFloor() {
-  $("#legend").innerHTML = Object.entries(STATES).filter(([k]) => VENUE !== "bar" || (k !== "sent" && k !== "ready")).map(([k, v]) => "<span><i style='background:" + stateColor(k) + "'></i>" + v + "</span>").join("");
-  const openN = Object.values(S.checks).length; const tabsN = Object.values(S.checks).filter((c) => !c.tableId).length;
-  $("#floortools").innerHTML = (VENUE === "bar" ? "<button class='btn sm primary' id='quickBtn'>Quick sale</button>" : "") + "<button class='btn sm" + (mineOnly ? " on" : "") + "' id='mineBtn'>" + (VENUE === "bar" ? "My stools" : "My tables") + "</button><button class='btn sm' id='openBtn'>Open checks: " + openN + "</button>" + (tabsN ? "<button class='btn sm' id='tabsBtn'>Bar tabs: " + tabsN + "</button>" : "") + (can("transfer") ? "<button class='btn sm' id='moveBtn'>" + (VENUE === "bar" ? "Move a stool" : "Move a table") + "</button>" : "") + (VENUE === "bar" ? "<span class='sp'></span><button class='btn sm' id='drawerBtn'>Drawer</button><button class='btn sm warn' id='lastCallBtn'>Last call</button>" : "") + (happyNow() ? "<div class='hh'>" + esc(happyLabel()) + "</div>" : "");
-  $("#mineBtn").onclick = () => { mineOnly = !mineOnly; drawFloor(); }; const qb = $("#quickBtn"); if (qb) qb.onclick = quickSale; const lb = $("#lastCallBtn"); if (lb) lb.onclick = lastCall; const db = $("#drawerBtn"); if (db) db.onclick = drawerSheet;
-  $("#openBtn").onclick = openChecksSheet; const tb = $("#tabsBtn"); if (tb) tb.onclick = () => show("tabs"); const mb = $("#moveBtn"); if (mb) mb.onclick = () => moveTableFlow(null);
-  drawReady();
+  const checks = Object.values(S.checks); const openN = checks.length; const tabsN = checks.filter((c) => !c.tableId).length;
+  const onFloor = checks.reduce((n, c) => n + remaining(c), 0);
+  // Tool row: the things a bartender or server reaches for, then who is working.
+  const byServer = {}; for (const c of checks) byServer[c.server] = (byServer[c.server] || 0) + 1;
+  const working = S.staff.filter((x) => byServer[x.id] || (me && x.id === me.id));
+  $("#floortools").innerHTML =
+    (VENUE === "bar" ? "<button class='btn sm primary' id='quickBtn'>Quick sale</button><button class='btn sm' id='newTabBtn'>Open a tab</button>" : "<button class='btn sm primary' id='newTabBtn'>Open a tab</button>") +
+    (can("transfer") ? "<button class='btn sm' id='moveBtn'>Move</button>" : "") +
+    "<span class='vsep'></span><div class='serverchips'>" + working.map((x) => "<button class='schip" + (mineOnly && me && x.id === me.id ? " on" : "") + "' data-s='" + x.id + "'><i style='background:" + serverColor(x.id) + "'>" + esc(initials(x.name)) + "</i>" + esc(x.name) + "<small>" + (byServer[x.id] || 0) + " open</small></button>").join("") + "</div>" +
+    "<span class='sp'></span>" + (happyNow() ? "<span class='hhbadge' title='" + esc(happyLabel()) + "'>" + esc(happyLabel().split(" - ")[0]) + "</span>" : "") +
+    (VENUE === "bar" ? "<button class='btn sm' id='drawerBtn'>Drawer</button><button class='btn sm warn' id='lastCallBtn'>Last call</button>" : "");
+  const qb = $("#quickBtn"); if (qb) qb.onclick = quickSale; $("#newTabBtn").onclick = () => $("#newTab").click();
+  const lb = $("#lastCallBtn"); if (lb) lb.onclick = lastCall; const db = $("#drawerBtn"); if (db) db.onclick = drawerSheet; const mb = $("#moveBtn"); if (mb) mb.onclick = () => moveTableFlow(null);
+  $(".serverchips").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; mineOnly = !(mineOnly && me && b.dataset.s === me.id) && me && b.dataset.s === me.id; drawFloor(); };
+  drawReady(); drawCheckList(); drawMap();
+  $("#legend").innerHTML = Object.entries(STATES).filter(([k]) => VENUE !== "bar" || (k !== "sent" && k !== "ready")).map(([k, v]) => "<span><i style='background:" + stateColor(k) + "'></i>" + v + "</span>").join("") + "<span class='sub' style='margin-left:auto'>" + openN + " open &middot; " + money(onFloor) + " on the floor</span>";
+}
+// Left column: every open check as a row, newest touch first. Tabs filter it.
+function drawCheckList() {
+  const checks = Object.values(S.checks).sort((a, b) => b.touched - a.touched);
+  const tabs = [["open", "Open", checks.length], ["tabs", "Tabs", checks.filter((c) => !c.tableId).length], ["mine", "Mine", me ? checks.filter((c) => c.server === me.id).length : 0], ["closed", "Closed", onDay(dkey()).length]];
+  $("#ltabs").innerHTML = tabs.map(([k, l, n]) => "<button data-k='" + k + "' class='" + (k === listTab ? "on" : "") + "'>" + l + (n ? " <b>" + n + "</b>" : "") + "</button>").join("");
+  $("#ltabs").onclick = (e) => { const b = e.target.closest("button"); if (b) { listTab = b.dataset.k; drawCheckList(); } };
+  const R = $("#lrows");
+  if (listTab === "closed") {
+    const cl = onDay(dkey()).slice().reverse().slice(0, 40);
+    R.innerHTML = cl.length ? cl.map((c) => "<div class='lrow closed'><span class='bar' style='background:var(--line2)'></span><span><b>" + esc(c.table) + "</b><small>" + esc(c.by) + " &middot; " + timeOf(c.at) + " &middot; " + esc(c.method || "") + "</small></span><span class='r'><b class='mono'>" + money(c.sale + c.tax - (c.discount || 0)) + "</b><small>tip " + money(c.tip) + "</small></span></div>").join("") : "<div class='empty'>Nothing closed yet today.</div>";
+    return;
+  }
+  const list = checks.filter((c) => listTab === "tabs" ? !c.tableId : listTab === "mine" ? (me && c.server === me.id) : true);
+  R.innerHTML = list.length ? list.map((c) => { const st = c.tableId ? tableState(tableOf(c.tableId)) : (c.requested ? "check" : c.lines.some((l) => l.status === "sent") ? "served" : c.lines.length ? "entered" : "seated"); const g = c.guestId ? guestName(c.guestId) : (c.tab && c.tab.name) || (c.quick ? "Quick sale" : "Walk-in");
+    return "<button class='lrow' data-c='" + c.id + "'><span class='bar' style='background:" + serverColor(c.server) + "'></span><span><b>" + esc(checkLabel(c)) + "</b><small>" + esc(g) + " &middot; " + esc(staffName(c.server)) + " &middot; " + mins(c.opened) + " min</small></span><span class='r'><b class='mono'>" + money(checkTotals(c).total) + "</b><small class='st' data-st='" + st + "'>" + STATES[st] + "</small></span></button>"; }).join("") : "<div class='empty'>" + (listTab === "tabs" ? "No open tabs." : listTab === "mine" ? "Nothing open on you." : "Nothing open. Tap a " + (VENUE === "bar" ? "stool" : "table") + " to start.") + "</div>";
+  R.onclick = (e) => { const b = e.target.closest("button.lrow"); if (!b) return; cur = b.dataset.c; curGuest = 1; show("order"); };
+}
+// Right side: the room as flat shapes. Bar: one slab and numbered stools. Restaurant: zones with tables and chairs.
+function drawMap() {
   const W = $("#floorwrap"); W.innerHTML = "";
-  const zones = VENUE === "bar" ? [] : [...new Set(S.tables.map((t) => t.zone))];
   if (VENUE === "bar") {
-    // The bar itself: back bar, the counter, and a numbered stool for every seat along it.
-    const room = document.createElement("div"); room.className = "barroom";
-    room.innerHTML = "<div class='backbar'><div class='glow'></div>" + backbarBottles() + "<div class='shelf' style='top:30px'></div><div class='shelf' style='bottom:6px'></div><span class='plaque'>L&amp;J</span></div><div class='counter'><div class='taps'><i class='tap'></i><i class='tap'></i><i class='tap'></i><i class='tap'></i></div><span class='name'>Bar</span><div class='brass'></div></div>";
-    const row = document.createElement("div"); row.className = "stools";
+    const room = document.createElement("div"); room.className = "flatbar";
+    room.innerHTML = "<div class='slab'><span>Back bar</span><i></i><span>Taps</span><i></i><span>Well</span><i></i><span>Register</span></div>";
+    const row = document.createElement("div"); row.className = "stoolrow";
     for (const t of S.tables) {
-      const c = checkOfTable(t.id); const st = tableState(t);
-      if (mineOnly && (!c || c.server !== (me || {}).id)) continue;
-      const b = document.createElement("button"); b.className = "tbl stool" + (c && me && c.server === me.id ? " mine" : "");
-      b.dataset.st = st; b.dataset.t = t.id;
-      const num = (t.label.match(/\d+/) || [t.label])[0];
-      b.innerHTML = "<span class='seat'>" + esc(num) + "</span><span class='foot'></span><span class='cap'>" + (c ? "<small>" + esc(staffName(c.server)) + " &middot; " + mins(c.opened) + " min</small><span class='amt mono'>" + money(sums(c.lines).total) + "</span>" : "") + "<span class='st'>" + STATES[st] + "</span></span>";
-      b.title = t.label;
+      const c = checkOfTable(t.id); const st = tableState(t); const dim = mineOnly && (!c || c.server !== (me || {}).id);
+      const b = document.createElement("button"); b.className = "stool2" + (c ? " busy" : "") + (dim ? " dim" : ""); b.dataset.st = st; b.dataset.t = t.id; b.title = t.label;
+      const col = c ? serverColor(c.server) : "";
+      b.innerHTML = "<span class='dot' style='" + (c ? "background:" + col + ";box-shadow:0 0 0 3px var(--panel2),0 0 0 5px " + col : "") + "'>" + esc((t.label.match(/\d+/) || [t.label])[0]) + "</span>" + (c ? "<small>" + mins(c.opened) + "m</small><b class='mono'>" + money(sums(c.lines).total) + "</b><em style='color:" + stateColor(st) + "'>" + STATES[st] + "</em>" : "<small>open</small>");
       longPress(b, () => openTable(t.id), () => tableMenu(t.id));
       row.appendChild(b);
     }
-    room.appendChild(row); W.appendChild(room);
+    room.appendChild(row); W.appendChild(room); return;
   }
+  const zones = [...new Set(S.tables.map((t) => t.zone))];
   for (const z of zones) {
     const h = document.createElement("div"); h.className = "zonehead"; h.textContent = z; W.appendChild(h);
-    const f = document.createElement("div"); f.className = "floor"; f.style.height = (VENUE === "bar" ? 300 : z === "Bar" ? 150 : z === "Patio" ? 170 : 330) + "px";
+    const f = document.createElement("div"); f.className = "floor"; f.style.height = (z === "Bar" ? 150 : z === "Patio" ? 170 : 330) + "px";
     for (const t of S.tables.filter((x) => x.zone === z)) {
-      const c = checkOfTable(t.id); const st = tableState(t);
-      if (mineOnly && (!c || c.server !== (me || {}).id)) continue;
-      const b = document.createElement("button"); b.className = "tbl " + (t.shape === "round" ? "round" : t.shape === "bar" ? "bar" : "") + (c && me && c.server === me.id ? " mine" : "");
+      const c = checkOfTable(t.id); const st = tableState(t); const dim = mineOnly && (!c || c.server !== (me || {}).id);
+      const b = document.createElement("button"); b.className = "tbl " + (t.shape === "round" ? "round" : t.shape === "bar" ? "bar" : "") + (dim ? " dim" : "");
       b.dataset.st = st; b.dataset.t = t.id; b.style.left = t.x + "%"; b.style.top = t.y + "%"; b.style.width = t.w + "%"; b.style.height = t.h + "%";
+      if (c) b.style.setProperty("--sc", serverColor(c.server));
       const who = c ? staffName(c.server) : "";
-      b.innerHTML = seatsHTML(t) + "<b>" + esc(t.label) + "</b>" + (c ? "<small>" + c.guests + (c.guests === 1 ? " guest" : " guests") + " &middot; " + esc(who) + "</small><small>" + mins(c.opened) + " min</small><span class='amt mono'>" + money(sums(c.lines).total) + "</span>" : "<small>" + (VENUE === "bar" ? "open" : t.seats ? t.seats + " seats" : "phone and walk-up") + "</small>") + "<span class='st'>" + STATES[st] + "</span>";
+      b.innerHTML = seatsHTML(t) + "<b>" + esc(t.label) + "</b>" + (c ? "<small>" + c.guests + (c.guests === 1 ? " guest" : " guests") + " &middot; " + esc(who) + "</small><small>" + mins(c.opened) + " min</small><span class='amt mono'>" + money(sums(c.lines).total) + "</span>" : "<small>" + (t.seats ? t.seats + " seats" : "phone and walk-up") + "</small>") + "<span class='st'>" + STATES[st] + "</span>";
       longPress(b, () => openTable(t.id), () => tableMenu(t.id));
       f.appendChild(b);
     }
     W.appendChild(f);
-  }
-  if (VENUE === "bar") {
-    const h = document.createElement("div"); h.className = "zonehead"; h.textContent = "Open tabs (not on a stool)"; W.appendChild(h);
-    const strip = document.createElement("div"); strip.className = "tabs-strip";
-    const tabs = Object.values(S.checks).filter((c) => !c.tableId).sort((a, b) => b.touched - a.touched);
-    strip.innerHTML = tabs.map((c) => "<button class='tabchip' data-c='" + c.id + "'><b>" + esc(c.tab.name || "No name") + "</b><small>" + [c.tab.card ? "card " + c.tab.card : "", c.tab.phone].filter(Boolean).join(" - ") + "</small><small class='mono'>" + money(checkTotals(c).total) + " - " + mins(c.opened) + " min - " + esc(staffName(c.server)) + "</small></button>").join("") + "<button class='tabchip add' id='newTabFloor'>+ Open a tab</button><button class='tabchip add quick' id='quickFloor'>Quick sale - pay now</button>";
-    strip.onclick = (e) => { const b = e.target.closest("button"); if (!b) return; if (b.id === "newTabFloor") return $("#newTab").click(); if (b.id === "quickFloor") return quickSale(); cur = b.dataset.c; curGuest = 1; show("order"); };
-    W.appendChild(strip);
   }
 }
 function stateColor(k) { return { available: "var(--faint)", seated: "var(--blue)", entered: "var(--amber)", sent: "var(--amber)", ready: "var(--green)", served: "var(--green)", check: "var(--purple)", paid: "var(--muted)" }[k]; }
